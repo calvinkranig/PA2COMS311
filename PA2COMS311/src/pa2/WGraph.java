@@ -2,6 +2,7 @@ package pa2;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -11,19 +12,16 @@ import java.util.PriorityQueue;
  *
  */
 public class WGraph {
-	private class EdgeComparator implements Comparator<Node>{
+	private class NodeComparator implements Comparator<Node>{
 		@Override
 		public int compare(Node n1, Node n2) {
-			int xdiff = n1.x -n2.x;
-			if(xdiff == 0){
-				return n1.y - n2.y;
-			}
-			return xdiff;
+			return n1.dst-n2.dst;
 		}
 	}
 	private class Edge{
 		private Node dst;
 		private int weight;
+		
 		public Edge(Node dst, int weight) {
 			this.dst = dst;
 			this.weight = weight;
@@ -42,12 +40,17 @@ public class WGraph {
 		private int x;
 		private int y;
 		private Node parent;
+		private int dst;
 		private LinkedList<Edge> edges;
+		private boolean inQ;
+		
 		public Node(int x, int y) {
 			this.x = x;
 			this.y = y;
 			edges = new LinkedList<Edge>();
 			parent = null;
+			dst = Integer.MAX_VALUE;
+			inQ = false;
 		}
 		public LinkedList<Edge> edges() {
 			return edges;
@@ -61,12 +64,16 @@ public class WGraph {
 		public void setParent(Node n){
 			parent = n;
 		}
+		public void setDST(int dst){
+			this.dst = dst;
+		}
 		public void addAdjacent(Node n, int weight){
 			edges.add(new Edge(n, weight));
 		}
+		
 	}
 	
-	private Node[][] graph;
+	private Node[] graph;
 	
 	public WGraph(String fName) {
 		
@@ -74,7 +81,6 @@ public class WGraph {
 	}
 	
 	private void parseFile(String fName){
-		
 	}
 	
 	/**
@@ -93,9 +99,19 @@ public class WGraph {
 	 * @return
 	 */
 	public ArrayList<Integer> V2V(int ux, int uy, int vx, int vy){
-		PriorityQueue<Node> minheap = new PriorityQueue<Node>(new EdgeComparator());
+		PriorityQueue<Node> minheap = new PriorityQueue<Node>(new NodeComparator());
+		Node src = resetNodes(ux, uy);
 		
-		
+		//add all nodes to PQ
+		for(Node n : this.graph){
+			minheap.add(n);
+			n.inQ = true;
+		}
+		//perform Dijkstras
+		Node dst = Dijkstras(minheap, vx, vy);
+		if(dst!= null){
+			return returnPath(dst);
+		}
 		
 		return null;
 	}
@@ -107,6 +123,38 @@ public class WGraph {
 	
 	public ArrayList<Integer> S2S(ArrayList<Integer> S1, ArrayList<Integer> S2){
 		return null;
+	}
+	
+	private Node Dijkstras(PriorityQueue<Node> minheap, int x, int y){
+		while(!minheap.isEmpty()){
+			Node curMin = minheap.poll();
+			Iterator<Edge> i = curMin.edges.iterator();
+			while(i.hasNext()){
+				Edge curE = i.next();
+				if(curE.dst.inQ){
+					
+				}
+			}
+			
+		}
+		
+		return null;
+	}
+	
+	private Node resetNodes(int x, int y){
+		Node srcNode = null;
+		for(int i = 0; i<this.graph.length; i++){
+			Node cur = this.graph[i];
+			if(cur.x == x && cur.y ==y){
+				srcNode = cur;
+				cur.setDST(0);
+				cur.setParent(null);
+			}
+			else{
+				cur.setDST(Integer.MAX_VALUE);
+			}
+		}
+		return srcNode;
 	}
 	
 	private ArrayList<Integer> returnPath(Node end){
