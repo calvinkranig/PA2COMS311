@@ -1,6 +1,8 @@
 package pa2;
 
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.PriorityQueue;
 
 
 /**
@@ -10,18 +12,20 @@ import java.util.ArrayList;
  * starts at 1.
  * @param <T>
  */
-public class PriorityQ<T>{
+public class PriorityQ<T> extends PriorityQueue{
 	
 	private ArrayList<T> heapArray;
 	private int heapSize;
+	Comparator comparator;
 	
 	/**
 	 * Creates an empty priority queue.
 	 */
-	public PriorityQ() {
+	public PriorityQ(Comparator c) {
 		heapArray = new ArrayList<T>(); // pretty sure the max # of strings is 200
 		heapArray.add(null);
-		heapSize = 0; // new priQ has no size
+		heapSize = 0;
+		this.comparator = c;// new priQ has no size
 	}
 	
 	
