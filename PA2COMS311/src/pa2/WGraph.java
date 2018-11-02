@@ -15,7 +15,7 @@ public class WGraph {
 	private class NodeComparator implements Comparator<Node>{
 		@Override
 		public int compare(Node n1, Node n2) {
-			return n1.dst-n2.dst;
+			return n1.distanceToSource-n2.distanceToSource;
 		}
 	}
 	private class Edge{
@@ -40,7 +40,7 @@ public class WGraph {
 		private int x;
 		private int y;
 		private Node parent;
-		private int dst;
+		private int distanceToSource;
 		private LinkedList<Edge> edges;
 		private boolean inQ;
 		
@@ -49,7 +49,7 @@ public class WGraph {
 			this.y = y;
 			edges = new LinkedList<Edge>();
 			parent = null;
-			dst = Integer.MAX_VALUE;
+			distanceToSource = Integer.MAX_VALUE;
 			inQ = false;
 		}
 		public LinkedList<Edge> edges() {
@@ -65,7 +65,7 @@ public class WGraph {
 			parent = n;
 		}
 		public void setDST(int dst){
-			this.dst = dst;
+			this.distanceToSource = dst;
 		}
 		public void addAdjacent(Node n, int weight){
 			edges.add(new Edge(n, weight));
@@ -126,13 +126,25 @@ public class WGraph {
 	}
 	
 	private Node Dijkstras(PriorityQueue<Node> minheap, int x, int y){
-		while(!minheap.isEmpty()){
-			Node curMin = minheap.poll();
+		Node curMin = null;
+		//Update once decrease key is implemented
+		while(!minheap.isEmpty()&&(curMin = minheap.poll()).inQ){
+			curMin.inQ = false;
+			//Is curMin the destination?
+			if(curMin.x == x && curMin.y ==y){
+				return curMin;
+			}
+			
 			Iterator<Edge> i = curMin.edges.iterator();
 			while(i.hasNext()){
 				Edge curE = i.next();
 				if(curE.dst.inQ){
-					
+					if(curE.dst.distanceToSource< curMin.distanceToSource+curE.weight){
+						curE.dst.distanceToSource = curMin.distanceToSource+curE.weight;
+						curE.dst.parent = curMin;
+						//decrease key in PQ need to do
+						minheap.add(curE.dst);
+					}
 				}
 			}
 			
