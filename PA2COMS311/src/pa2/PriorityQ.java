@@ -14,7 +14,7 @@ import java.util.PriorityQueue;
  */
 public class PriorityQ<T> extends PriorityQueue{
 	
-	private ArrayList<T> heapArray;
+	private ArrayList<Entry> heapArray;
 	private int heapSize;
 	Comparator comparator;
 	
@@ -22,7 +22,7 @@ public class PriorityQ<T> extends PriorityQueue{
 	 * Creates an empty priority queue.
 	 */
 	public PriorityQ(Comparator c) {
-		heapArray = new ArrayList<T>(); // pretty sure the max # of strings is 200
+		heapArray = new ArrayList<Entry>(); // pretty sure the max # of strings is 200
 		heapArray.add(null);
 		heapSize = 0;
 		this.comparator = c;// new priQ has no size
@@ -44,13 +44,13 @@ public class PriorityQ<T> extends PriorityQueue{
 	 * @param s String to be added to the queue.
 	 * @param p Priority of the added String.
 	 */
-	public void add(String s, int p) {
-		Entry e = new Entry(s, p); // encapsulate the string and priority into an Entry
+	public void add(T s, int p) {
+		Entry e = new Entry(s, p); // encapsulate the object and priority into an Entry
 		
 		int position = ++heapSize; //start position at the end of the heap
 		heapArray.add(position, e); // put the new entry at the end of the heap
 		
-		while(position != 1 && p > heapArray.get(position / 2).getPriority()) { // while the position isn't 1 and the priority of the new entry is greater than its parent
+		while(position != 1 && p <heapArray.get(position / 2).getPriority()) { // while the position isn't 1 and the priority of the new entry is greater than its parent
 			heapArray.set(position, heapArray.get(position / 2)); // move the parent down the heap
 			position /= 2; // the position moves to the parent
 		}
@@ -61,7 +61,7 @@ public class PriorityQ<T> extends PriorityQueue{
 	 * Returns a String whose priority is maximum.
 	 * @return String with max priority.
 	 */
-	public String returnMax() {
+	public T returnMin() {
 		if(this.isEmpty()){
 			return null;
 		}
@@ -79,11 +79,11 @@ public class PriorityQ<T> extends PriorityQueue{
 	 * Returns a String whose priority is maximum and removes it from the priority queue.
 	 * @return Maximum, extracted String.
 	 */
-	public String extractMax() {	
+	public T extractMin() {	
 		if(this.isEmpty()){
 			return null;
 		}
-		String max = this.returnMax(); // save string for the return
+		T max = this.returnMin(); // save string for the return
 		swap(1, this.getSize()); // swap the first and last elements in the heap
 		heapSize--; // decrement heap
 		
@@ -138,7 +138,7 @@ public class PriorityQ<T> extends PriorityQueue{
 	 * @param i index of Entry that holds the returned value
 	 * @return value of specified Entry
 	 */
-	public String getValue(int i) {
+	public T getValue(int i) {
 		return heapArray.get(i).getAddress();
 	}
 	
@@ -165,21 +165,21 @@ public class PriorityQ<T> extends PriorityQueue{
 	 */
 	private void heapify(int i) {
 
-		int largest = i;
+		int smallest = i;
 		int left = 2*i;
 		int right = 2*i + 1;
 		
-		if((left <= heapSize) && (heapArray.get(largest).getPriority() < heapArray.get(left).getPriority())) {
-			largest = left;
+		if((left <= heapSize) && (heapArray.get(smallest).getPriority() > heapArray.get(left).getPriority())) {
+			smallest = left;
 		}
 		
-		if((right <= heapSize) && (heapArray.get(largest).getPriority() < heapArray.get(right).getPriority())) {
-			largest = right;
+		if((right <= heapSize) && (heapArray.get(smallest).getPriority() > heapArray.get(right).getPriority())) {
+			smallest = right;
 		}
 		
-		if (largest != i) {
-			swap(i, largest);
-			heapify(largest);
+		if (smallest != i) {
+			swap(i, smallest);
+			heapify(smallest);
 		}
 	}
 	
@@ -200,11 +200,11 @@ public class PriorityQ<T> extends PriorityQueue{
 	 *
 	 */
 	protected class Entry{
-		private String address;
+		private T object;
 		private int priority;
 		
-		private Entry(String address, int priority) {
-			this.address = address;
+		private Entry(T object, int priority) {
+			this.object = object;
 			this.priority = priority;
 		}
 		
@@ -212,8 +212,8 @@ public class PriorityQ<T> extends PriorityQueue{
 			return priority;
 		}
 		
-		private String getAddress() {
-			return address;
+		private T getAddress() {
+			return object;
 		}
 	}
 
