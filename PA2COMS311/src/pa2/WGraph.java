@@ -1,5 +1,9 @@
 package pa2;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -7,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
+import java.util.Scanner;
 
 /**
  * @author ckranig, ans66
@@ -91,7 +96,44 @@ public class WGraph {
 	}
 	
 	private void parseFile(String fName){
-		
+		//may need to swich to " "
+			String delims = "[ ]+";
+			try {
+				BufferedReader in = new BufferedReader(new FileReader(fName));
+				//Get number of nodes
+				String nextLine = in.readLine();
+				nodes = new Node[Character.getNumericValue(nextLine.charAt(0))];
+				//Get number of edges
+				 nextLine = in.readLine();
+				 int edges= Character.getNumericValue(nextLine.charAt(0));
+				 int index = 0;
+				 while((nextLine = in.readLine()) != null){
+					 String[] tokens = nextLine.split(delims);
+					 Integer sx = Integer.getInteger(tokens[0]);
+					 Integer sy = Integer.getInteger(tokens[1]);
+					 Integer dx = Integer.getInteger(tokens[2]);
+					 Integer dy = Integer.getInteger(tokens[3]);
+					 Integer weight = Integer.getInteger(tokens[4]);
+					 
+					 if(Graph[dx][dy] == null){
+						 Node dst = new Node(dx,dy);
+						 Graph[dx][dy] = dst;
+						 nodes[index] = dst;
+						 index++;
+					 }	
+					 if(Graph[sx][sy] == null){
+						 Node src = new Node(sx,sy);
+						 Graph[sx][sy] = src;
+						 nodes[index] = src;
+						 index++;
+					 }
+					 Graph[sx][sy].addAdjacent(Graph[dx][dy], weight);
+				 }		
+				in.close();
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			
 	}
 	
 	/**
