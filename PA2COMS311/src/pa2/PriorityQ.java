@@ -120,6 +120,13 @@ public class PriorityQ<T> extends PriorityQueue{
 		
 	}
 	
+	private int find(T object, int priority){
+		int i = 1;
+		while(i<)
+		
+		return -1;
+	}
+	
 	/**
 	 * Returns an array B with the following property: B[i] = key(A[i]) for all i in the array A used to implement the priority queue.
 	 * @return Priority Array of the priority queue.

@@ -87,9 +87,11 @@ public class WGraph {
 	public WGraph(String fName) {
 		Graph = new Node[Integer.MAX_VALUE][Integer.MAX_VALUE];
 		// TODO Auto-generated constructor stub
+		
 	}
 	
 	private void parseFile(String fName){
+		
 	}
 	
 	/**
