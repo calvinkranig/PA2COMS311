@@ -146,7 +146,7 @@ public class WGraph {
 			BufferedReader in = new BufferedReader(new FileReader(fName));
 			// Get number of nodes
 			String nextLine = in.readLine();
-			int nodenumber = Character.getNumericValue(nextLine.charAt(0));
+			int nodenumber = Integer.parseInt(nextLine);
 			nodes = new Node[nodenumber];
 			GraphMap = new HashMap<Coord,Node>(nodenumber);
 
@@ -186,6 +186,7 @@ public class WGraph {
 				e.printStackTrace();
 			}
 		} catch (Exception e) {
+			System.out.println("Incorrectly Formatted File");
 			e.printStackTrace();
 		}
 
@@ -275,7 +276,10 @@ public class WGraph {
 		}
 
 		if (dst != null) {
-			return returnPath(dst);
+			ArrayList<Integer> returnList = returnPath(dst.parent());
+			returnList.remove(returnList.size()-1);
+			returnList.remove(returnList.size()-1);
+			return returnList;
 		} else {
 			return null;
 		}
@@ -300,7 +304,7 @@ public class WGraph {
 						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
 						curE.dst.setParent(curMin);
 						// decrease key in PQ need to do
-						minheap.add(curE.dst);
+						minheap.decrementPriority(curE.dst.position(), 0);
 					}
 				}
 			}
@@ -604,7 +608,9 @@ public class WGraph {
 		
 		private void bubbleUp(int i){
 			int position = i;
-			while (position > 1 && heapArray.get(i).dstToSrc() < heapArray.get(position / 2).dstToSrc()){
+		
+			while (position > 1 && heapArray.get(position).dstToSrc() < heapArray.get(position / 2).dstToSrc()){
+				int posit2 = position/2;
 				swap(position, position/2);
 				position = position/2;
 			}
