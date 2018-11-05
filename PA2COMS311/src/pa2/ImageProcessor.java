@@ -119,7 +119,17 @@ private int getImportanceSingle(int i, int j) {
 
 
 	public ArrayList<ArrayList<Integer>> getImportance(){
-		return null;
+		
+		ArrayList<ArrayList<Integer>> I = new ArrayList<ArrayList<Integer>>();
+		
+		for(int i = 0; i < H; ++i) {
+			ArrayList<Integer> row = new ArrayList<Integer>();
+			for(int j = 0; j < W; ++j) {
+				row.add(j, getImportanceSingle(i, j));
+			}
+			I.add(row);
+		}
+		return I;
 		
 	}
 	
