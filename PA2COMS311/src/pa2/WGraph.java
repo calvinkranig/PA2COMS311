@@ -66,7 +66,7 @@ public class WGraph {
 		}
 	}
 
-	public class Node {
+	private class Node {
 		private final Coord cordinate;
 		private Node parent;
 		private LinkedList<Edge> edges;
@@ -407,7 +407,7 @@ public class WGraph {
 		return path;
 	}
 
-	public class PriorityQ {
+	private class PriorityQ {
 
 		private ArrayList<Node> heapArray;
 		private int heapSize;
