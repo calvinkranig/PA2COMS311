@@ -66,7 +66,7 @@ public class WGraph {
 		}
 	}
 
-	public class Node {
+	private class Node {
 		private final Coord cordinate;
 		private Node parent;
 		private LinkedList<Edge> edges;
