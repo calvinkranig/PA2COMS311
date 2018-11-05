@@ -71,6 +71,7 @@ public class WGraph {
 		private Node parent;
 		private LinkedList<Edge> edges;
 		private boolean inQ;
+		private boolean discovered;
 		private int position;
 		private int dstToSrc;
 
@@ -79,6 +80,7 @@ public class WGraph {
 			edges = new LinkedList<Edge>();
 			parent = null;
 			inQ = false;
+			discovered = false;
 			position = -1;
 			dstToSrc = Integer.MAX_VALUE;
 		}
@@ -106,6 +108,10 @@ public class WGraph {
 		public Node parent() {
 			return this.parent;
 		}
+		
+		public boolean discovered(){
+			return this.discovered;
+		}
 
 		public void setParent(Node n) {
 			parent = n;
@@ -117,6 +123,10 @@ public class WGraph {
 
 		public void setPosition(int n) {
 			this.position = n;
+		}
+		
+		public void setDiscovered(boolean b){
+			this.discovered = b;
 		}
 
 		public void addAdjacent(Node n, int weight) {
@@ -135,8 +145,8 @@ public class WGraph {
 	private Node[] nodes;
 	private HashMap<Coord, Node> GraphMap;
 
-	public WGraph(String fName) {
-		parseFile(fName);
+	public WGraph(String FName) {
+		parseFile(FName);
 	}
 
 	private void parseFile(String fName) {
@@ -146,7 +156,7 @@ public class WGraph {
 			BufferedReader in = new BufferedReader(new FileReader(fName));
 			// Get number of nodes
 			String nextLine = in.readLine();
-			int nodenumber = Character.getNumericValue(nextLine.charAt(0));
+			int nodenumber = Integer.parseInt(nextLine);
 			nodes = new Node[nodenumber];
 			GraphMap = new HashMap<Coord,Node>(nodenumber);
 
@@ -186,6 +196,7 @@ public class WGraph {
 				e.printStackTrace();
 			}
 		} catch (Exception e) {
+			System.out.println("Incorrectly Formatted File");
 			e.printStackTrace();
 		}
 
@@ -207,7 +218,7 @@ public class WGraph {
 		if (dst != null) {
 			return returnPath(dst);
 		} else {
-			return null;
+			return new ArrayList<Integer>();
 		}
 	}
 
@@ -225,15 +236,14 @@ public class WGraph {
 	public ArrayList<Integer> V2S(int ux, int uy, ArrayList<Integer> S) {
 		// Do Dijsktra BFS and stop when first node in Set S is pulled from the
 		// PQ
-		PriorityQ minheap = makeHeap(ux, uy);
 		HashSet<Node> set = toNodeSet(S);
-
+		PriorityQ minheap = makeHeap(ux, uy);
 		// perform Dijkstras
 		Node dst = SetDijkstras(minheap, set);
 		if (dst != null) {
 			return returnPath(dst);
 		} else {
-			return null;
+			return new ArrayList<Integer>();
 		}
 	}
 
@@ -246,11 +256,11 @@ public class WGraph {
 		// Create two new nodes S1n, and S2n such that S1n is connected to all
 		// nodes in S1 and all nodes in S2 are connected to S2n
 		// Call Dijsktras on S1n and S2n
-		Node S1n = new Node(-1, -1);
-		Node S2n = new Node(-2, -2);
 		LinkedList<Node> L1 = this.toNodeList(S1);
 		LinkedList<Node> L2 = this.toNodeList(S2);
 
+		Node S1n = new Node(-1, -1);
+		Node S2n = new Node(-2, -2);
 		for (Node n : L1) {
 			S1n.addAdjacent(n, 0);
 		}
@@ -266,7 +276,8 @@ public class WGraph {
 		S1n.setDstToSrc(0);
 		minheap.add(S1n);
 		S1n.inQ = true;
-
+		S1n.setDiscovered(true);
+		
 		// perform Dijkstras
 		Node dst = Dijkstras(minheap, S2n.x(), S2n.y());
 		// Remove S2n from adjacency list of nodes
@@ -275,9 +286,13 @@ public class WGraph {
 		}
 
 		if (dst != null) {
-			return returnPath(dst);
+			ArrayList<Integer> returnList = returnPath(dst.parent());
+			//remove added endnode
+			returnList.remove(returnList.size()-1);
+			returnList.remove(returnList.size()-1);
+			return returnList;
 		} else {
-			return null;
+			return new ArrayList<Integer>();
 		}
 	}
 
@@ -285,8 +300,8 @@ public class WGraph {
 		// Dealing with entrys now
 		Node curMin = null;
 		// Update once decrease key is implemented
-		while (!minheap.isEmpty()) {
-			curMin = minheap.extractMin();
+		while (!minheap.isEmpty()&&(curMin = minheap.extractMin()).discovered()) {
+			
 			// Is curMin the destination?
 			if (set.contains(curMin)) {
 				return curMin;
@@ -299,8 +314,9 @@ public class WGraph {
 					if (curE.dst.dstToSrc() > curMin.dstToSrc() + curE.weight) {
 						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
 						curE.dst.setParent(curMin);
+						curE.dst.setDiscovered(true);
 						// decrease key in PQ need to do
-						minheap.add(curE.dst);
+						minheap.decrementPriority(curE.dst.position(), 0);
 					}
 				}
 			}
@@ -317,6 +333,7 @@ public class WGraph {
 		while (i.hasNext()) {
 			Integer x = i.next();
 			Integer y = i.next();
+			Coord newC = new Coord(x,y);
 			set.add(this.GraphMap.get(new Coord(x, y)));
 		}
 
@@ -330,6 +347,7 @@ public class WGraph {
 		while (i.hasNext()) {
 			Integer x = i.next();
 			Integer y = i.next();
+			Coord newC = new Coord(x,y);
 			list.add(this.GraphMap.get(new Coord(x, y)));
 		}
 
@@ -340,8 +358,8 @@ public class WGraph {
 		// Dealing with entrys now
 		Node curMin = null;
 		// Update once decrease key is implemented
-		while (!minheap.isEmpty()) {
-			curMin = minheap.extractMin();
+		while (!minheap.isEmpty()&& (curMin = minheap.extractMin()).discovered()) {
+			
 			curMin.inQ = false;
 			// Is curMin the destination?
 			if (curMin.x() == x && curMin.y() == y) {
@@ -355,6 +373,7 @@ public class WGraph {
 					if (curE.dst.dstToSrc() > curMin.dstToSrc() + curE.weight) {
 						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
 						curE.dst.setParent(curMin);
+						curE.dst.setDiscovered(true);
 						// decrease key in PQ need to do
 						minheap.decrementPriority(curE.dst.position(), 0);
 					}
@@ -383,10 +402,12 @@ public class WGraph {
 				newQ.add(cur);
 				cur.setParent(null);
 				cur.inQ = true;
+				cur.setDiscovered(true);
 			} else {
 				cur.setDstToSrc(Integer.MAX_VALUE);
 				newQ.add(cur);
 				cur.inQ = true;
+				cur.setDiscovered(false);
 			}
 		}
 		return newQ;
@@ -403,7 +424,7 @@ public class WGraph {
 		return path;
 	}
 
-	public class PriorityQ {
+	private class PriorityQ {
 
 		private ArrayList<Node> heapArray;
 		private int heapSize;
@@ -604,7 +625,9 @@ public class WGraph {
 		
 		private void bubbleUp(int i){
 			int position = i;
-			while (position > 1 && heapArray.get(i).dstToSrc() < heapArray.get(position / 2).dstToSrc()){
+		
+			while (position > 1 && heapArray.get(position).dstToSrc() < heapArray.get(position / 2).dstToSrc()){
+				int posit2 = position/2;
 				swap(position, position/2);
 				position = position/2;
 			}
