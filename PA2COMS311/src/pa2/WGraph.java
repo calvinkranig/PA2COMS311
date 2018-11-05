@@ -208,7 +208,7 @@ public class WGraph {
 		if (dst != null) {
 			return returnPath(dst);
 		} else {
-			return null;
+			return new ArrayList<Integer>();
 		}
 	}
 
@@ -234,7 +234,7 @@ public class WGraph {
 		if (dst != null) {
 			return returnPath(dst);
 		} else {
-			return null;
+			return new ArrayList<Integer>();
 		}
 	}
 
@@ -277,11 +277,12 @@ public class WGraph {
 
 		if (dst != null) {
 			ArrayList<Integer> returnList = returnPath(dst.parent());
+			//remove added endnode
 			returnList.remove(returnList.size()-1);
 			returnList.remove(returnList.size()-1);
 			return returnList;
 		} else {
-			return null;
+			return new ArrayList<Integer>();
 		}
 	}
 
