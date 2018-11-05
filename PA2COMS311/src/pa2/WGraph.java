@@ -145,8 +145,8 @@ public class WGraph {
 	private Node[] nodes;
 	private HashMap<Coord, Node> GraphMap;
 
-	public WGraph(String fName) {
-		parseFile(fName);
+	public WGraph(String FName) {
+		parseFile(FName);
 	}
 
 	private void parseFile(String fName) {
