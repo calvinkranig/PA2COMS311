@@ -12,9 +12,9 @@ import java.util.HashMap;
 public class ImageProcessor {
 	
 	private class Pixel{
-		int r;
-		int g;
-		int b;
+		final int r;
+		final int g;
+		final int b;
 		public Pixel(int r, int g, int b){
 			this.r=r;
 			this.g=g;
@@ -23,21 +23,15 @@ public class ImageProcessor {
 		public int r() {
 			return r;
 		}
-		public void setR(int r) {
-			this.r = r;
-		}
+
 		public int g() {
 			return g;
 		}
-		public void setG(int g) {
-			this.g = g;
-		}
+
 		public int b() {
 			return b;
 		}
-		public void setB(int b) {
-			this.b = b;
-		}
+
 		
 	}
 	//First category is height 2nd is width
