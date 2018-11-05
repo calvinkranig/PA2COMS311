@@ -240,15 +240,22 @@ public class WGraph {
 	 */
 	public ArrayList<Integer> V2S(int ux, int uy, ArrayList<Integer> S) {
 		//Check arguments for validity
-				if(!this.GraphMap.containsKey(new Coord(ux,uy))){
-					System.out.println("Illegal Arguments, Vertices not in Graph");
-					return new ArrayList<Integer>();
-				}
+		if(!this.GraphMap.containsKey(new Coord(ux,uy))){
+			System.out.println("Illegal Arguments, Vertices not in Graph");
+			return new ArrayList<Integer>();
+		}
+		if(S.size()%2!=0){
+			System.out.println("Illegal Arguments, Non Even Set");
+			return new ArrayList<Integer>();
+		}
 		// Do Dijsktra BFS and stop when first node in Set S is pulled from the
 		// PQ
-		PriorityQ minheap = makeHeap(ux, uy);
 		HashSet<Node> set = toNodeSet(S);
-
+		if(set==null){
+			System.out.println("List contain vertice/vertices not in Graph");
+			return new ArrayList<Integer>();
+		}
+		PriorityQ minheap = makeHeap(ux, uy);
 		// perform Dijkstras
 		Node dst = SetDijkstras(minheap, set);
 		if (dst != null) {
@@ -267,11 +274,18 @@ public class WGraph {
 		// Create two new nodes S1n, and S2n such that S1n is connected to all
 		// nodes in S1 and all nodes in S2 are connected to S2n
 		// Call Dijsktras on S1n and S2n
-		Node S1n = new Node(-1, -1);
-		Node S2n = new Node(-2, -2);
+		if(S1.size()%2!=0 ||S2.size()%2!=0 ){
+			System.out.println("Illegal Arguments, Non Even Set");
+			return new ArrayList<Integer>();
+		}
 		LinkedList<Node> L1 = this.toNodeList(S1);
 		LinkedList<Node> L2 = this.toNodeList(S2);
-
+		if(L1==null||L2==null){
+			System.out.println("Lists contain vertice/vertices not in Graph");
+			return new ArrayList<Integer>();
+		}
+		Node S1n = new Node(-1, -1);
+		Node S2n = new Node(-2, -2);
 		for (Node n : L1) {
 			S1n.addAdjacent(n, 0);
 		}
@@ -364,7 +378,14 @@ public class WGraph {
 		while (i.hasNext()) {
 			Integer x = i.next();
 			Integer y = i.next();
-			list.add(this.GraphMap.get(new Coord(x, y)));
+			Coord newC = new Coord(x,y);
+			if(this.GraphMap.containsKey(newC)){
+				list.add(this.GraphMap.get(new Coord(x, y)));
+			}
+			else{
+				//Bad vertex in set
+				return null;
+			}
 		}
 
 		return list;
