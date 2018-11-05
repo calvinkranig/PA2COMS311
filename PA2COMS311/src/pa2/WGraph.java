@@ -71,6 +71,7 @@ public class WGraph {
 		private Node parent;
 		private LinkedList<Edge> edges;
 		private boolean inQ;
+		private boolean discovered;
 		private int position;
 		private int dstToSrc;
 
@@ -79,6 +80,7 @@ public class WGraph {
 			edges = new LinkedList<Edge>();
 			parent = null;
 			inQ = false;
+			discovered = false;
 			position = -1;
 			dstToSrc = Integer.MAX_VALUE;
 		}
@@ -106,6 +108,10 @@ public class WGraph {
 		public Node parent() {
 			return this.parent;
 		}
+		
+		public boolean discovered(){
+			return this.discovered;
+		}
 
 		public void setParent(Node n) {
 			parent = n;
@@ -117,6 +123,10 @@ public class WGraph {
 
 		public void setPosition(int n) {
 			this.position = n;
+		}
+		
+		public void setDiscovered(boolean b){
+			this.discovered = b;
 		}
 
 		public void addAdjacent(Node n, int weight) {
@@ -202,6 +212,11 @@ public class WGraph {
 	 * sequence of vertices)
 	 */
 	public ArrayList<Integer> V2V(int ux, int uy, int vx, int vy) {
+		//Check arguments for validity
+		if(!this.GraphMap.containsKey(new Coord(ux,uy))||!this.GraphMap.containsKey(new Coord(vx,vy))){
+			System.out.println("Illegal Arguments, Vertices not in Graph");
+			return new ArrayList<Integer>();
+		}
 		PriorityQ minheap = makeHeap(ux, uy);
 		// perform Dijkstras
 		Node dst = Dijkstras(minheap, vx, vy);
@@ -224,6 +239,11 @@ public class WGraph {
 	 * sequence of vertices)
 	 */
 	public ArrayList<Integer> V2S(int ux, int uy, ArrayList<Integer> S) {
+		//Check arguments for validity
+				if(!this.GraphMap.containsKey(new Coord(ux,uy))){
+					System.out.println("Illegal Arguments, Vertices not in Graph");
+					return new ArrayList<Integer>();
+				}
 		// Do Dijsktra BFS and stop when first node in Set S is pulled from the
 		// PQ
 		PriorityQ minheap = makeHeap(ux, uy);
@@ -267,7 +287,8 @@ public class WGraph {
 		S1n.setDstToSrc(0);
 		minheap.add(S1n);
 		S1n.inQ = true;
-
+		S1n.setDiscovered(true);
+		
 		// perform Dijkstras
 		Node dst = Dijkstras(minheap, S2n.x(), S2n.y());
 		// Remove S2n from adjacency list of nodes
@@ -290,8 +311,8 @@ public class WGraph {
 		// Dealing with entrys now
 		Node curMin = null;
 		// Update once decrease key is implemented
-		while (!minheap.isEmpty()) {
-			curMin = minheap.extractMin();
+		while (!minheap.isEmpty()&&(curMin = minheap.extractMin()).discovered()) {
+			
 			// Is curMin the destination?
 			if (set.contains(curMin)) {
 				return curMin;
@@ -304,6 +325,7 @@ public class WGraph {
 					if (curE.dst.dstToSrc() > curMin.dstToSrc() + curE.weight) {
 						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
 						curE.dst.setParent(curMin);
+						curE.dst.setDiscovered(true);
 						// decrease key in PQ need to do
 						minheap.decrementPriority(curE.dst.position(), 0);
 					}
@@ -322,7 +344,14 @@ public class WGraph {
 		while (i.hasNext()) {
 			Integer x = i.next();
 			Integer y = i.next();
-			set.add(this.GraphMap.get(new Coord(x, y)));
+			Coord newC = new Coord(x,y);
+			if(this.GraphMap.containsKey(newC)){
+				set.add(this.GraphMap.get(new Coord(x, y)));
+			}
+			else{
+				//Bad vertex in set
+				return null;
+			}
 		}
 
 		return set;
@@ -345,8 +374,8 @@ public class WGraph {
 		// Dealing with entrys now
 		Node curMin = null;
 		// Update once decrease key is implemented
-		while (!minheap.isEmpty()) {
-			curMin = minheap.extractMin();
+		while (!minheap.isEmpty()&& (curMin = minheap.extractMin()).discovered()) {
+			
 			curMin.inQ = false;
 			// Is curMin the destination?
 			if (curMin.x() == x && curMin.y() == y) {
@@ -360,6 +389,7 @@ public class WGraph {
 					if (curE.dst.dstToSrc() > curMin.dstToSrc() + curE.weight) {
 						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
 						curE.dst.setParent(curMin);
+						curE.dst.setDiscovered(true);
 						// decrease key in PQ need to do
 						minheap.decrementPriority(curE.dst.position(), 0);
 					}
@@ -388,10 +418,12 @@ public class WGraph {
 				newQ.add(cur);
 				cur.setParent(null);
 				cur.inQ = true;
+				cur.setDiscovered(true);
 			} else {
 				cur.setDstToSrc(Integer.MAX_VALUE);
 				newQ.add(cur);
 				cur.inQ = true;
+				cur.setDiscovered(false);
 			}
 		}
 		return newQ;
