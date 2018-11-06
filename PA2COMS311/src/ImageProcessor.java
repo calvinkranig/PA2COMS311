@@ -9,6 +9,10 @@ import java.util.HashMap;
 
 
 
+/**
+ * @author ckranig, ans66
+ *
+ */
 public class ImageProcessor {
 	
 	private class Pixel{
