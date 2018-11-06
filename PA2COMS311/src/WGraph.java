@@ -1,7 +1,6 @@
 
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -333,7 +332,6 @@ public class WGraph {
 		while (i.hasNext()) {
 			Integer x = i.next();
 			Integer y = i.next();
-			Coord newC = new Coord(x,y);
 			set.add(this.GraphMap.get(new Coord(x, y)));
 		}
 
@@ -347,7 +345,6 @@ public class WGraph {
 		while (i.hasNext()) {
 			Integer x = i.next();
 			Integer y = i.next();
-			Coord newC = new Coord(x,y);
 			list.add(this.GraphMap.get(new Coord(x, y)));
 		}
 
@@ -627,7 +624,6 @@ public class WGraph {
 			int position = i;
 		
 			while (position > 1 && heapArray.get(position).dstToSrc() < heapArray.get(position / 2).dstToSrc()){
-				int posit2 = position/2;
 				swap(position, position/2);
 				position = position/2;
 			}
