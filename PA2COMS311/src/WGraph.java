@@ -248,9 +248,9 @@ public class WGraph {
 	}
 
 	/**
-	 * @param S1
-	 * @param S2
-	 * @return
+	 * pre: S1 and S2 represent sets of vertices (see above for
+	 * the representation of a set of vertices as arrayList)
+	 * post: same structure as the last method's post.
 	 */
 	public ArrayList<Integer> S2S(ArrayList<Integer> S1, ArrayList<Integer> S2) {
 		// Create two new nodes S1n, and S2n such that S1n is connected to all
