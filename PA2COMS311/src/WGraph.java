@@ -287,8 +287,8 @@ public class WGraph {
 		if (dst != null) {
 			ArrayList<Integer> returnList = returnPath(dst.parent());
 			//remove added endnode
-			returnList.remove(returnList.size()-1);
-			returnList.remove(returnList.size()-1);
+			returnList.remove(0);
+			returnList.remove(0);
 			return returnList;
 		} else {
 			return new ArrayList<Integer>();
@@ -414,13 +414,22 @@ public class WGraph {
 		ArrayList<Integer> path = new ArrayList<Integer>();
 		Node cur = end;
 		while (cur != null) {
-			path.add(cur.x());
 			path.add(cur.y());
+			path.add(cur.x());
 			cur = cur.parent;
 		}
-		return path;
+		return reversePath(path);
 	}
-
+	
+	private ArrayList<Integer> reversePath(ArrayList<Integer> path){
+		ArrayList<Integer> reversePath = new ArrayList<Integer>();
+		for(int i = path.size()-1; i>=0; i--){
+			int it = path.get(i);
+			reversePath.add(path.get(i));
+		}
+		return reversePath;
+	}
+	
 	private class PriorityQ {
 
 		private ArrayList<Node> heapArray;
