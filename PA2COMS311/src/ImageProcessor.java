@@ -60,7 +60,7 @@ public class ImageProcessor {
 					W = Integer.parseInt(nextLine);
 					//Create imagegraph
 					M = new Pixel[H][W];
-					for(int i = 0; i<M.length; i++) {
+					for(int i = 0; i<H; i++) {
 						nextLine = in.readLine();
 						String[] tokens = nextLine.split(delims);
 						for(int j= 0; j< tokens.length; j+=3){
@@ -124,15 +124,46 @@ private int getImportanceSingle(int i, int j) {
 
 	public ArrayList<ArrayList<Integer>> getImportance(){
 		
-		ArrayList<ArrayList<Integer>> I = new ArrayList<ArrayList<Integer>>();
+		ArrayList<ArrayList<Integer>> I = new ArrayList<ArrayList<Integer>>(H);
+		//calculate edge cases here
+		//Do First Row
+		ArrayList<Integer> row = new ArrayList<Integer>(W);
+		//M[0][0]
+		row.add(PDist(M[H - 1][0], M[1][0])+PDist(M[0][W-1], M[0][1]));
+		//M[0][j]
+		for(int j=1; j<W-1;j++){
+			row.add(PDist(M[H - 1][j], M[1][j])+PDist(M[0][j-1], M[0][j+1]));
+		}
+		//M[0][W-1]
+		row.add(PDist(M[H - 1][W-1], M[1][W-1])+PDist(M[0][W-2], M[0][0]));
+		//Add row
+		I.add(row);
 		
-		for(int i = 0; i < H; ++i) {
-			ArrayList<Integer> row = new ArrayList<Integer>();
-			for(int j = 0; j < W; ++j) {
-				row.add(j, getImportanceSingle(i, j));
+		for(int i = 1; i < H-1; ++i) {
+			row = new ArrayList<Integer>(W);
+			//Do First Column
+			//M[i][0]
+			row.add(PDist(M[i - 1][0], M[i+1][0])+PDist(M[i][W-1], M[i][1]));
+			for(int j = 1; j < W-1; ++j) {
+				row.add(PDist(M[i - 1][j], M[i+1][j])+PDist(M[i][j-1], M[i][j+1]));
 			}
+			//Do Last Column M[i][W-1]
+			row.add(PDist(M[i-1][W-1], M[i+1][W-1])+PDist(M[i][W-2], M[i][0]));
+			//Add row
 			I.add(row);
 		}
+		//DO Last Row
+		row = new ArrayList<Integer>(W);
+		//M[H-1][0]
+		row.add(PDist(M[H - 2][0], M[0][0])+PDist(M[H-1][W-1], M[H-1][1]));
+		//M[H-1][j]
+		for(int j=1; j<W-1;j++){
+			row.add(PDist(M[H - 2][j], M[0][j])+PDist(M[H-1][j-1], M[H-1][j+1]));
+		}
+		//M[H-1][W-1]
+		row.add(PDist(M[H - 2][W-1], M[0][W-1])+PDist(M[H-1][W-2], M[H-1][0]));
+		//Add rowy
+		I.add(row);
 		return I;
 		
 	}
