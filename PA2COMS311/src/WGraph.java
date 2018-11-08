@@ -11,7 +11,8 @@ import java.util.LinkedList;
 
 
 
-/*
+
+
 /**
  * @author ckranig, ans66
  *
@@ -70,7 +71,6 @@ public class WGraph {
 	protected class Node {
 		private final Coord cordinate;
 		private Node parent;
-		private Pixel pixel;
 		private LinkedList<Edge> edges;
 		private boolean inQ;
 		private boolean discovered;

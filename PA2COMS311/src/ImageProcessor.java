@@ -15,7 +15,7 @@ import java.util.HashMap;
  */
 public class ImageProcessor {
 	
-	protected class Pixel{
+	public class Pixel{
 		final int r;
 		final int g;
 		final int b;
@@ -122,6 +122,12 @@ private int getImportanceSingle(int i, int j) {
 
 
 
+	/**
+	 * Compute Importance matrix: The matrix I capturing the importance values for each
+	 * element in M
+	 * pre:
+	 * post: returns the 2-D matrix I as per its definition
+	 */
 	public ArrayList<ArrayList<Integer>> getImportance(){
 		
 		ArrayList<ArrayList<Integer>> I = new ArrayList<ArrayList<Integer>>(H);
@@ -168,6 +174,16 @@ private int getImportanceSingle(int i, int j) {
 		
 	}
 	
+	/**
+	 * Compute the reduced image (reduction in width by k) and write the result in a file specified with FName
+	 * pre: W-k > 1
+	 * post: Compute the new image matrix after reducing the width by k
+	 * Follow the method for reduction described above
+	 * Write the result in a file named FName
+	 * in the same format as the input image matrix
+	 * @param k: width to reduce by
+	 * @param FName: File to write too
+	 */
 	public void writeReduced(int k, String FName) {
 		
 	}
