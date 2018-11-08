@@ -39,7 +39,7 @@ public class ImageProcessor {
 		
 	}
 	//First category is height 2nd is width
-	Pixel[][] M; // imageGraph
+	NodeGeneric<Pixel>[][] M; // imageGraph
 	int H;
 	int W;
 	
@@ -59,7 +59,7 @@ public class ImageProcessor {
 					nextLine=in.readLine();
 					W = Integer.parseInt(nextLine);
 					//Create imagegraph
-					M = new Pixel[H][W];
+					NodeGeneric<Pixel>[][] M;
 					for(int i = 0; i<H; i++) {
 						nextLine = in.readLine();
 						String[] tokens = nextLine.split(delims);
@@ -68,7 +68,7 @@ public class ImageProcessor {
 							Integer r = Integer.parseInt(tokens[j]);
 							Integer g = Integer.parseInt(tokens[j+1]);
 							Integer b = Integer.parseInt(tokens[j+2]);
-							this.M[i][j/3]=new Pixel(r,g,b);
+							this.M[i][j/3]= new NodeGeneric<Pixel>(new Pixel(r,g,b));
 						}
 
 						
@@ -84,7 +84,7 @@ public class ImageProcessor {
 				}
 	}
 	
-	private static int PDist(Pixel p, Pixel q) {
+private static int PDist(Pixel p, Pixel q) {
 		int red = (p.r - q.r) * (p.r - q.r);
 		int green = (p.g - q.g) * (p.g - q.g);
 		int blue = (p.b - q.b) * (p.b - q.b);
@@ -98,23 +98,23 @@ private int getImportanceSingle(int i, int j) {
 		int XImportance = 0;
 		
 		if (i == 0) {
-			YImportance = PDist(M[H - 1][j], M[i+1][j]);
+			YImportance = PDist(M[H - 1][j].object(), M[i+1][j].object());
 		}
 		else if(i == H - 1) {
-			YImportance = PDist(M[i - 1][j], M[0][j]);
+			YImportance = PDist(M[i - 1][j].object(), M[0][j].object());
 		}
 		else {
-			YImportance = PDist(M[i-1][j], M[i+1][j]);
+			YImportance = PDist(M[i-1][j].object(), M[i+1][j].object());
 		}
 		
 		if(j == 0) {
-			XImportance = PDist(M[i][W], M[i][j+1]);
+			XImportance = PDist(M[i][W].object(), M[i][j+1].object());
 		}
 		else if(j == W - 1) {
-			XImportance = PDist(M[i][j-1], M[i][0]);
+			XImportance = PDist(M[i][j-1].object(), M[i][0].object());
 		}
 		else {
-			XImportance = PDist(M[i][j-1], M[i][j+1]);
+			XImportance = PDist(M[i][j-1].object(), M[i][j+1].object());
 		}
 		
 		return XImportance + YImportance;
@@ -135,13 +135,19 @@ private int getImportanceSingle(int i, int j) {
 		//Do First Row
 		ArrayList<Integer> row = new ArrayList<Integer>(W);
 		//M[0][0]
-		row.add(PDist(M[H - 1][0], M[1][0])+PDist(M[0][W-1], M[0][1]));
+		Integer cur = PDist(M[H - 1][0].object(), M[1][0].object())+PDist(M[0][W-1].object(), M[0][1].object());
+		M[0][0].setWeight(cur);
+		row.add(cur);
 		//M[0][j]
 		for(int j=1; j<W-1;j++){
-			row.add(PDist(M[H - 1][j], M[1][j])+PDist(M[0][j-1], M[0][j+1]));
+			cur = PDist(M[H - 1][j].object(), M[1][j].object())+PDist(M[0][j-1].object(), M[0][j+1].object());
+			M[0][j].setWeight(cur);
+			row.add(cur);
 		}
 		//M[0][W-1]
-		row.add(PDist(M[H - 1][W-1], M[1][W-1])+PDist(M[0][W-2], M[0][0]));
+		cur = PDist(M[H - 1][W-1].object(), M[1][W-1].object())+PDist(M[0][W-2].object(), M[0][0].object());
+		M[0][W-1].setWeight(cur);
+		row.add(cur);
 		//Add row
 		I.add(row);
 		
@@ -149,25 +155,38 @@ private int getImportanceSingle(int i, int j) {
 			row = new ArrayList<Integer>(W);
 			//Do First Column
 			//M[i][0]
-			row.add(PDist(M[i - 1][0], M[i+1][0])+PDist(M[i][W-1], M[i][1]));
+			cur = PDist(M[i - 1][0].object(), M[i+1][0].object())+PDist(M[i][W-1].object(), M[i][1].object());
+			M[i][0].setWeight(cur);
+			row.add(cur);
+			
 			for(int j = 1; j < W-1; ++j) {
-				row.add(PDist(M[i - 1][j], M[i+1][j])+PDist(M[i][j-1], M[i][j+1]));
+				cur = PDist(M[i - 1][j].object(), M[i+1][j].object())+PDist(M[i][j-1].object(), M[i][j+1].object());
+				M[i][j].setWeight(cur);
+				row.add(cur);
 			}
 			//Do Last Column M[i][W-1]
-			row.add(PDist(M[i-1][W-1], M[i+1][W-1])+PDist(M[i][W-2], M[i][0]));
+			cur = PDist(M[i-1][W-1].object(), M[i+1][W-1].object())+PDist(M[i][W-2].object(), M[i][0].object());
+			M[i][W-1].setWeight(cur);
+			row.add(cur);
 			//Add row
 			I.add(row);
 		}
 		//DO Last Row
 		row = new ArrayList<Integer>(W);
 		//M[H-1][0]
-		row.add(PDist(M[H - 2][0], M[0][0])+PDist(M[H-1][W-1], M[H-1][1]));
+		cur = PDist(M[H - 2][0].object(), M[0][0].object())+PDist(M[H-1][W-1].object(), M[H-1][1].object());
+		M[H-1][0].setWeight(cur);
+		row.add(cur);
 		//M[H-1][j]
 		for(int j=1; j<W-1;j++){
-			row.add(PDist(M[H - 2][j], M[0][j])+PDist(M[H-1][j-1], M[H-1][j+1]));
+			cur = PDist(M[H - 2][j].object(), M[0][j].object())+PDist(M[H-1][j-1].object(), M[H-1][j+1].object());
+			M[H-1][j].setWeight(cur);
+			row.add(cur);
 		}
 		//M[H-1][W-1]
-		row.add(PDist(M[H - 2][W-1], M[0][W-1])+PDist(M[H-1][W-2], M[H-1][0]));
+		cur = PDist(M[H - 2][W-1].object(), M[0][W-1].object())+PDist(M[H-1][W-2].object(), M[H-1][0].object());
+		M[H-1][W-1].setWeight(cur);
+		row.add(cur);
 		//Add rowy
 		I.add(row);
 		return I;
@@ -185,6 +204,14 @@ private int getImportanceSingle(int i, int j) {
 	 * @param FName: File to write too
 	 */
 	public void writeReduced(int k, String FName) {
+		
+	}
+	
+	private void removeColumn(){
+		this.getImportance();
+	}
+	
+	private void Dijkstras(){
 		
 	}
 	
