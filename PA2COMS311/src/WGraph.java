@@ -9,6 +9,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 
+
+
 /*
 /**
  * @author ckranig, ans66
@@ -65,9 +67,10 @@ public class WGraph {
 		}
 	}
 
-	private class Node {
+	protected class Node {
 		private final Coord cordinate;
 		private Node parent;
+		private Pixel pixel;
 		private LinkedList<Edge> edges;
 		private boolean inQ;
 		private boolean discovered;

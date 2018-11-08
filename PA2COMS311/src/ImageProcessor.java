@@ -15,11 +15,11 @@ import java.util.HashMap;
  */
 public class ImageProcessor {
 	
-	private class Pixel{
+	protected class Pixel{
 		final int r;
 		final int g;
 		final int b;
-		public Pixel(int r, int g, int b){
+		public Pixel(final int r,final int g, final int b){
 			this.r=r;
 			this.g=g;
 			this.b = b;
