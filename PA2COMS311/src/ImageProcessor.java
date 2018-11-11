@@ -39,7 +39,7 @@ public class ImageProcessor {
 		
 	}
 	//First category is height 2nd is width
-	NodeGeneric<Pixel>[][] M; // imageGraph
+	ArrayList<Pixel>[] M; // imageGraph
 	int H;
 	int W;
 	
@@ -59,7 +59,7 @@ public class ImageProcessor {
 					nextLine=in.readLine();
 					W = Integer.parseInt(nextLine);
 					//Create imagegraph
-					NodeGeneric<Pixel>[][] M;
+					M = new ArrayList<Pixel>[H];
 					for(int i = 0; i<H; i++) {
 						nextLine = in.readLine();
 						String[] tokens = nextLine.split(delims);

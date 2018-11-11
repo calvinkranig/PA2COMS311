@@ -18,131 +18,7 @@ import java.util.LinkedList;
  *
  */
 public class WGraph {
-	/*
-	 * private class NodeComparator implements Comparator<Node>{
-	 * 
-	 * @Override public int compare(Node n1, Node n2) { return
-	 * n1.distanceToSource-n2.distanceToSource; } }
-	 */
-	private class Edge {
-		private Node dst;
-		private int weight;
-
-		public Edge(Node dst, int weight) {
-			this.dst = dst;
-			this.weight = weight;
-		}
-
-		public Node dst() {
-			return dst;
-		}
-
-		public int weight() {
-			return weight;
-		}
-	}
-
-	private class Coord {
-		private final int x;
-		private final int y;
-
-		public Coord(int x, int y) {
-
-			this.x = x;
-			this.y = y;
-		}
-
-		@Override
-		public int hashCode() {
-			return (x << 16) + y;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (obj.getClass() != this.getClass()) {
-				return false;
-			} else {
-				return (((Coord) obj).x == this.x && ((Coord) obj).y == this.y);
-
-			}
-		}
-	}
-
-	protected class Node{
-		private final Coord cordinate;
-		private Node parent;
-		private LinkedList<Edge> edges;
-		private boolean inQ;
-		private boolean discovered;
-		private int position;
-		private int dstToSrc;
-
-		public Node(int x, int y) {
-			cordinate = new Coord(x, y);
-			edges = new LinkedList<Edge>();
-			parent = null;
-			inQ = false;
-			discovered = false;
-			position = -1;
-			dstToSrc = Integer.MAX_VALUE;
-		}
-
-		public LinkedList<Edge> edges() {
-			return edges;
-		}
-
-		public int x() {
-			return cordinate.x;
-		}
-
-		public int y() {
-			return cordinate.y;
-		}
-
-		public int position() {
-			return this.position;
-		}
-
-		public int dstToSrc() {
-			return this.dstToSrc;
-		}
-
-		public Node parent() {
-			return this.parent;
-		}
-		
-		public boolean discovered(){
-			return this.discovered;
-		}
-
-		public void setParent(Node n) {
-			parent = n;
-		}
-
-		public void setDstToSrc(int n) {
-			this.dstToSrc = n;
-		}
-
-		public void setPosition(int n) {
-			this.position = n;
-		}
-		
-		public void setDiscovered(boolean b){
-			this.discovered = b;
-		}
-
-		public void addAdjacent(Node n, int weight) {
-			edges.add(new Edge(n, weight));
-		}
-
-		/**
-		 * Removes latest added node from list
-		 */
-		public void removeAdjacent() {
-			edges.removeLast();
-		}
-
-	}
+	
 
 	private Node[] nodes;
 	private HashMap<Coord, Node> GraphMap;
@@ -273,11 +149,11 @@ public class WGraph {
 
 		PriorityQ minheap = makeHeap(-1, -1);
 		minheap.add(S2n);
-		S2n.inQ = true;
+		S2n.setInQ(true);
 
 		S1n.setDstToSrc(0);
 		minheap.add(S1n);
-		S1n.inQ = true;
+		S1n.setInQ(true);;
 		S1n.setDiscovered(true);
 		
 		// perform Dijkstras
@@ -309,16 +185,16 @@ public class WGraph {
 				return curMin;
 			}
 
-			Iterator<Edge> i = curMin.edges.iterator();
+			Iterator<Edge> i = curMin.edges().iterator();
 			while (i.hasNext()) {
 				Edge curE = i.next();
-				if (curE.dst.inQ) {
-					if (curE.dst.dstToSrc() > curMin.dstToSrc() + curE.weight) {
-						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
-						curE.dst.setParent(curMin);
-						curE.dst.setDiscovered(true);
+				if (curE.dst().inQ()) {
+					if (curE.dst().dstToSrc() > curMin.dstToSrc() + curE.weight()) {
+						curE.dst().setDstToSrc(curMin.dstToSrc() + curE.weight());
+						curE.dst().setParent(curMin);
+						curE.dst().setDiscovered(true);
 						// decrease key in PQ need to do
-						minheap.decrementPriority(curE.dst.position(), 0);
+						minheap.decrementPriority(curE.dst().position(), 0);
 					}
 				}
 			}
@@ -360,22 +236,22 @@ public class WGraph {
 		// Update once decrease key is implemented
 		while (!minheap.isEmpty()&& (curMin = minheap.extractMin()).discovered()) {
 			
-			curMin.inQ = false;
+			curMin.setInQ(false);
 			// Is curMin the destination?
 			if (curMin.x() == x && curMin.y() == y) {
 				return curMin;
 			}
 
-			Iterator<Edge> i = curMin.edges.iterator();
+			Iterator<Edge> i = curMin.edges().iterator();
 			while (i.hasNext()) {
 				Edge curE = i.next();
-				if (curE.dst.inQ) {
-					if (curE.dst.dstToSrc() > curMin.dstToSrc() + curE.weight) {
-						curE.dst.setDstToSrc(curMin.dstToSrc() + curE.weight);
-						curE.dst.setParent(curMin);
-						curE.dst.setDiscovered(true);
+				if (curE.dst().inQ()) {
+					if (curE.dst().dstToSrc() > curMin.dstToSrc() + curE.weight()) {
+						curE.dst().setDstToSrc(curMin.dstToSrc() + curE.weight());
+						curE.dst().setParent(curMin);
+						curE.dst().setDiscovered(true);
 						// decrease key in PQ need to do
-						minheap.decrementPriority(curE.dst.position(), 0);
+						minheap.decrementPriority(curE.dst().position(), 0);
 					}
 				}
 			}
@@ -401,12 +277,12 @@ public class WGraph {
 				cur.setDstToSrc(0);
 				newQ.add(cur);
 				cur.setParent(null);
-				cur.inQ = true;
+				cur.setInQ(true);
 				cur.setDiscovered(true);
 			} else {
 				cur.setDstToSrc(Integer.MAX_VALUE);
 				newQ.add(cur);
-				cur.inQ = true;
+				cur.setInQ(true);
 				cur.setDiscovered(false);
 			}
 		}
@@ -419,7 +295,7 @@ public class WGraph {
 		while (cur != null) {
 			path.add(cur.y());
 			path.add(cur.x());
-			cur = cur.parent;
+			cur = cur.parent();
 		}
 		return reversePath(path);
 	}
@@ -651,8 +527,8 @@ public class WGraph {
 		 */
 		private void swap(int i, int j) {
 
-			heapArray.get(j).position = i;
-			heapArray.get(i).position = j;
+			heapArray.get(j).setPosition(i);
+			heapArray.get(i).setPosition(j);
 			Node temp = heapArray.get(i);
 			heapArray.set(i, heapArray.get(j));
 			heapArray.set(j, temp);
