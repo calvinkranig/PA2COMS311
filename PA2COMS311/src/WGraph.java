@@ -160,7 +160,7 @@ public class WGraph {
 		Node dst = Dijkstras(minheap, S2n.x(), S2n.y());
 		// Remove S2n from adjacency list of nodes
 		for (Node n : L2) {
-			n.removeAdjacent();
+			n.removeLast();
 		}
 
 		if (dst != null) {

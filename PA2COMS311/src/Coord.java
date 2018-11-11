@@ -33,5 +33,6 @@ public class Coord {
 		public int y(){
 			return this.y;
 		}
+		
 }
 

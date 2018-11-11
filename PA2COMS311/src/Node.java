@@ -88,7 +88,7 @@ public class Node {
 		/**
 		 * Removes latest added node from list
 		 */
-		public void removeAdjacent() {
+		public void removeLast() {
 			edges.removeLast();
 		}
 
