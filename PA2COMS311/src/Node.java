@@ -40,6 +40,10 @@ public class Node {
 		public int y() {
 			return cordinate.y();
 		}
+		
+		public Coord coord(){
+			return this.cordinate;
+		}
 
 		public int position() {
 			return this.position;

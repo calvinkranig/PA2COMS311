@@ -53,12 +53,13 @@ public class ImageProcessor {
 	}
 	//First category is height 2nd is width
 	ArrayList<Pixel>[] M;// imageGraph
-	Stack<Pixel> nodesToUpdate;
 	final int H;
 	int W;
+	boolean importanceUpdated;
 	
 	public ImageProcessor(String FName){
 		this.H = parseFile(FName);	
+		importanceUpdated = false;
 	}
 	
 	private int parseFile(String FName){
@@ -84,9 +85,7 @@ public class ImageProcessor {
 							Integer b = Integer.parseInt(tokens[x+2]);
 							Pixel np = new Pixel(r,g,b,x,y);
 							//add new pixel to map
-							M[y].add(np);
-							//add new pixel to be updated
-							this.nodesToUpdate.push(np);		
+							M[y].add(np);	
 						}
 
 						
@@ -113,12 +112,10 @@ private static int PDist(Pixel p, Pixel q) {
 		return red + green + blue;
 	}
 	
-private int getImportancePixel(Pixel p) {
+private int getImportancePixel(int x, int y) {
 		
 		int YImportance = 0;
 		int XImportance = 0;
-		int x = p.x();
-		int y = p.y();
 		if(x == 0){
 			PDist(M[y].get(W-1),M[y].get(1));
 		}
@@ -143,7 +140,6 @@ private int getImportancePixel(Pixel p) {
 	}
 
 
-
 	/**
 	 * Compute Importance matrix: The matrix I capturing the importance values for each
 	 * element in M
@@ -151,25 +147,32 @@ private int getImportancePixel(Pixel p) {
 	 * post: returns the 2-D matrix I as per its definition
 	 */
 	public ArrayList<ArrayList<Integer>> getImportance(){
-		//Update needed importance
-		while(!this.nodesToUpdate.isEmpty()){
-			updatePixelImportance(this.nodesToUpdate.pop());
-		}
-		//Convert map into needed 2-D matrix
 		ArrayList<ArrayList<Integer>> importanceMatrix = new ArrayList<ArrayList<Integer>>(H);
-		for(int y = 0; y <H; y++){
-			ArrayList<Integer> row = new ArrayList<Integer>(W);
-			importanceMatrix.add(row);
-			for(int x = 0; x <W; x++){
-				importanceMatrix.get(y).add(this.M[y].get(x).importance());
+		//Update needed importance
+		if(!this.importanceUpdated){
+			for(int y = 0; y<H; y++){
+				ArrayList<Integer> row = new ArrayList<Integer>(W);
+				importanceMatrix.add(row);
+				for(int x = 0; x < W; x++){
+					int importance = this.getImportancePixel(x, y);
+					M[y].get(x).setImporatance(importance);
+					importanceMatrix.get(y).add(importance);
+				}
 			}
+			this.importanceUpdated = true;
+		}
+		else{
+			for(int y = 0; y<H; y++){
+				ArrayList<Integer> row = new ArrayList<Integer>(W);
+				importanceMatrix.add(row);
+				for(int x = 0; x < W; x++){
+					importanceMatrix.get(y).add(M[y].get(x).importance());
+				}
+		}
 		}
 		return importanceMatrix;
 	}
 	
-	private void updatePixelImportance(Pixel p){
-		p.setImporatance(this.getImportancePixel(p));
-	}
 	
 	/**
 	 * Compute the reduced image (reduction in width by k) and write the result in a file specified with FName
@@ -182,13 +185,22 @@ private int getImportancePixel(Pixel p) {
 	 * @param FName: File to write too
 	 */
 	public void writeReduced(int k, String FName) {
+		for(int i = 0; i< k; i++){
 		//Update needed importance
-		while(!this.nodesToUpdate.isEmpty()){
-			updatePixelImportance(this.nodesToUpdate.pop());
+		if(!this.importanceUpdated){
+			for(int y = 0; y<H; y++){
+				for(int x = 0; x < W; x++){
+					Pixel p = M[y].get(x);
+					p.setImporatance(this.getImportancePixel(x, y));
+					p.coord().setX(x);
+				}
+			}
+			this.importanceUpdated = true;
 		}
 		//Get Shortest Path
 		//Remove Nodes on Path
-		removeNodes(Dijkstras());
+		removeNodes(S2SDijkstras());
+		}
 		writeGraphToFile(FName);
 	}
 	
@@ -198,12 +210,82 @@ private int getImportancePixel(Pixel p) {
 	
 	private void removeNodes(LinkedList<Pixel> removeList){
 		
+		
+		this.W--;
 	}
 	
-	private LinkedList<Pixel> Dijkstras(){
-		
+	private LinkedList<Pixel> S2SDijkstras(){
+
+		PriorityQ minheap = makeHeap();	
+		// perform Dijkstras
+		Pixel dst = Dijkstras(minheap);
+
+		if (dst != null) {
+			//dst = new node
+			LinkedList<Pixel> returnList = returnPath(dst);
+			//remove added endnode
+			returnList.remove(0);
+			return returnList;
+		} else {
+			return null;
+		}
+	}
+	
+	private PriorityQ makeHeap(){
+		PriorityQ newQ = new PriorityQ(W*H);
+		//Add first Rowy
+		for(int x = 0 ;x < W; x++){
+			Pixel cur = M[0].get(x);
+			cur.setDiscovered(true);
+			cur.setDstToSrc(cur.importance());
+			newQ.add(cur);
+			cur.setParent(null);
+			cur.setInQ(true);
+		}
+		for(int y = 1; y<H; y++){
+			for(int x = 0; x < W; x++){
+				Pixel cur = M[y].get(x);
+				cur.setDiscovered(false);
+				cur.setDstToSrc(Integer.MAX_VALUE);
+				newQ.add(cur);
+				cur.setInQ(true);
+			}
+		}
+		return newQ;
+	}
+	
+	private Pixel Dijkstras(PriorityQ minheap){
+		// Dealing with entrys now
+		Pixel curMin = null;
+		// Update once decrease key is implemented
+		while (!minheap.isEmpty()&& (curMin = (Pixel)minheap.extractMin()).discovered()) {
+			curMin.setInQ(false);
+			//Is curMin Destination?
+			if(curMin.y()==this.H-1){
+				return curMin;
+			}
+			//Update Edges
+			updateEdges(curMin, minheap);
+		}
 		return null;
 	}
+	
+	private void updateEdges(Pixel parent, PriorityQ minheap){
+		if(parent.y()!=H-1){
+			int x = parent.x();
+			if(x==0){
+				
+			}
+			else if(x == W-1){
+				
+			}
+			else{
+				
+			}		
+		}
+	}
+	
+	
 	
 	private LinkedList<Pixel>returnPath(Pixel p){
 		LinkedList<Pixel> list = new LinkedList<Pixel>();
