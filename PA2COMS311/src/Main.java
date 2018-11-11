@@ -15,9 +15,11 @@ public class Main {
 		System.out.println(graph.V2S(500, 1, path2));
 		System.out.println(graph.S2S(path1, path2));
 		
-		fname = "";
+		fname = "image1.txt";
 		String output = "output.txt";
 		ImageProcessor ip = new ImageProcessor(fname);
+		System.out.print(ip.getImportance());
+		ip.writeReduced(1, output);
 	}
 
 }

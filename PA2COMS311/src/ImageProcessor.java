@@ -59,10 +59,10 @@ public class ImageProcessor {
 		
 	}
 	//First category is height 2nd is width
-	ArrayList<Pixel>[] M;// imageGraph
-	final int H;
-	int W;
-	boolean importanceUpdated;
+	private ArrayList<Pixel>[] M;// imageGraph
+	private final int H;
+	private int W;
+	private boolean importanceUpdated;
 	
 	public ImageProcessor(String FName){
 		this.H = parseFile(FName);	
@@ -91,7 +91,7 @@ public class ImageProcessor {
 							Integer r = Integer.parseInt(tokens[x]);
 							Integer g = Integer.parseInt(tokens[x+1]);
 							Integer b = Integer.parseInt(tokens[x+2]);
-							Pixel np = new Pixel(r,g,b,x,y);
+							Pixel np = new Pixel(r,g,b,x/3,y);
 							//add new pixel to map
 							M[y].add(np);	
 						}
@@ -125,23 +125,23 @@ private int getImportancePixel(int x, int y) {
 		int YImportance = 0;
 		int XImportance = 0;
 		if(x == 0){
-			PDist(M[y].get(W-1),M[y].get(1));
+			XImportance =PDist(M[y].get(W-1),M[y].get(1));
 		}
 		else if(x == W-1){
-			PDist(M[y].get(x-1),M[y].get(0));
+			XImportance = PDist(M[y].get(x-1),M[y].get(0));
 		}
 		else{
-			PDist(M[y].get(x-1),M[y].get(x+1));
+			XImportance = PDist(M[y].get(x-1),M[y].get(x+1));
 		}
 		
 		if(y == 0){
-			PDist(M[H-1].get(x), M[1].get(x));
+			YImportance = PDist(M[H-1].get(x), M[1].get(x));
 		}
 		else if(y == H-1){
-			PDist(M[y-1].get(x),M[0].get(x));
+			YImportance = PDist(M[y-1].get(x),M[0].get(x));
 		}
 		else{
-			PDist(M[y-1].get(x),M[y+1].get(x));
+			YImportance = PDist(M[y-1].get(x),M[y+1].get(x));
 		}
 		
 		return XImportance + YImportance;
@@ -210,7 +210,7 @@ private int getImportancePixel(int x, int y) {
 		//Get Shortest Path
 		//Remove Nodes on Path
 		removeNodes(S2SDijkstras());
-		k--;
+		remaining--;
 		}
 		//check if there is one column left
 		if(k!=0){
