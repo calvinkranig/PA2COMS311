@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Stack;
 
 
 
@@ -52,28 +53,28 @@ public class ImageProcessor {
 	}
 	//First category is height 2nd is width
 	ArrayList<Pixel>[] M;// imageGraph
-	LinkedList<Pixel> nodesToUpdate;
-	int H;
+	Stack<Pixel> nodesToUpdate;
+	final int H;
 	int W;
 	
 	public ImageProcessor(String FName){
-		parseFile(FName);
+		this.H = parseFile(FName);	
 	}
 	
-	private void parseFile(String FName){
+	private int parseFile(String FName){
 		// may need to swich to " "
 				String delims = "[ ]+";
 				try {
 					BufferedReader in = new BufferedReader(new FileReader(FName));
 					// Get Height
 					String nextLine = in.readLine();
-					H = Integer.parseInt(nextLine);
+					int height = Integer.parseInt(nextLine);
 					// Get Width
 					nextLine=in.readLine();
 					W = Integer.parseInt(nextLine);
 					//Create imagegraph
-					M = new ArrayList[H];
-					for(int y = 0; y<H; y++) {
+					M = new ArrayList[height];
+					for(int y = 0; y<height; y++) {
 						nextLine = in.readLine();
 						String[] tokens = nextLine.split(delims);
 						for(int x= 0; x< tokens.length; x+=3){
@@ -81,20 +82,27 @@ public class ImageProcessor {
 							Integer r = Integer.parseInt(tokens[x]);
 							Integer g = Integer.parseInt(tokens[x+1]);
 							Integer b = Integer.parseInt(tokens[x+2]);
-							M[y].add(new Pixel(r,g,b,x,y));
+							Pixel np = new Pixel(r,g,b,x,y);
+							//add new pixel to map
+							M[y].add(np);
+							//add new pixel to be updated
+							this.nodesToUpdate.push(np);		
 						}
 
 						
 					}
+					
 					try {
 						in.close();
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
+					return height;
 				} catch (Exception e) {
 					System.out.println("Incorrectly Formatted File");
 					e.printStackTrace();
 				}
+				return -1;
 	}
 	
 private static int PDist(Pixel p, Pixel q) {
@@ -109,13 +117,26 @@ private int getImportancePixel(Pixel p) {
 		
 		int YImportance = 0;
 		int XImportance = 0;
-		
-		switch(p.x()){
-		
+		int x = p.x();
+		int y = p.y();
+		if(x == 0){
+			PDist(M[y].get(W-1),M[y].get(1));
+		}
+		else if(x == W-1){
+			PDist(M[y].get(x-1),M[y].get(0));
+		}
+		else{
+			PDist(M[y].get(x-1),M[y].get(x+1));
 		}
 		
-		switch(p.y()){
-		
+		if(y == 0){
+			PDist(M[H-1].get(x), M[1].get(x));
+		}
+		else if(y == H-1){
+			PDist(M[y-1].get(x),M[0].get(x));
+		}
+		else{
+			PDist(M[y-1].get(x),M[y+1].get(x));
 		}
 		
 		return XImportance + YImportance;
@@ -131,8 +152,8 @@ private int getImportancePixel(Pixel p) {
 	 */
 	public ArrayList<ArrayList<Integer>> getImportance(){
 		//Update needed importance
-		for(Pixel p : this.nodesToUpdate){
-			updateNode(p);
+		while(!this.nodesToUpdate.isEmpty()){
+			updatePixelImportance(this.nodesToUpdate.pop());
 		}
 		//Convert map into needed 2-D matrix
 		ArrayList<ArrayList<Integer>> importanceMatrix = new ArrayList<ArrayList<Integer>>(H);
@@ -146,7 +167,7 @@ private int getImportancePixel(Pixel p) {
 		return importanceMatrix;
 	}
 	
-	private void updateNode(Pixel p){
+	private void updatePixelImportance(Pixel p){
 		p.setImporatance(this.getImportancePixel(p));
 	}
 	
@@ -161,15 +182,39 @@ private int getImportancePixel(Pixel p) {
 	 * @param FName: File to write too
 	 */
 	public void writeReduced(int k, String FName) {
+		//Update needed importance
+		while(!this.nodesToUpdate.isEmpty()){
+			updatePixelImportance(this.nodesToUpdate.pop());
+		}
+		//Get Shortest Path
+		//Remove Nodes on Path
+		removeNodes(Dijkstras());
+		writeGraphToFile(FName);
+	}
+	
+	private void writeGraphToFile(String FName){
 		
 	}
 	
-	private void removeColumn(){
-		this.getImportance();
+	private void removeNodes(LinkedList<Pixel> removeList){
+		
 	}
 	
-	private void Dijkstras(){
+	private LinkedList<Pixel> Dijkstras(){
 		
+		return null;
+	}
+	
+	private LinkedList<Pixel>returnPath(Pixel p){
+		LinkedList<Pixel> list = new LinkedList<Pixel>();
+		Pixel cur = p;
+		list.add(cur);
+		while (cur.parent() != null)
+		{
+			list.add((Pixel)cur.parent());
+			cur = (Pixel)cur.parent();
+		}
+		return list;
 	}
 	
 
