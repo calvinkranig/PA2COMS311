@@ -194,6 +194,7 @@ private int getImportancePixel(int x, int y) {
 				for(int x = 0; x < W; x++){
 					Pixel p = M[y].get(x);
 					p.setImporatance(this.getImportancePixel(x, y));
+					//Only important for this
 					p.coord().setX(x);
 				}
 			}
@@ -205,23 +206,26 @@ private int getImportancePixel(int x, int y) {
 		k--;
 		}
 		//check if there is one column left
-		if(k==0){
-			writeGraphToFile(FName);
+		if(k!=0){
+			//If we need to remove last column delete graph and write nothing to file
+			this.M = new ArrayList[0];
 		}
-		
+		writeGraphToFile(FName);	
 	}
 	
 	private void writeGraphToFile(String FName){
 		
 	}
 	
-	private void removeNodes(LinkedList<Pixel> removeList){
-		
-		
+	private void removeNodes(Stack<Pixel> removeList){
+		while(!removeList.isEmpty()){
+			Pixel cur = removeList.pop();
+			this.M[cur.y()].remove(cur.x());
+		}		
 		this.W--;
 	}
 	
-	private LinkedList<Pixel> S2SDijkstras(){
+	private Stack<Pixel> S2SDijkstras(){
 
 		PriorityQ minheap = makeHeap();	
 		// perform Dijkstras
@@ -322,8 +326,8 @@ private int getImportancePixel(int x, int y) {
 	
 	
 	
-	private LinkedList<Pixel>returnPath(Pixel p){
-		LinkedList<Pixel> list = new LinkedList<Pixel>();
+	private Stack<Pixel>returnPath(Pixel p){
+		Stack<Pixel> list = new Stack<Pixel>();
 		Pixel cur = p;
 		list.add(cur);
 		while (cur.parent() != null)
