@@ -76,6 +76,7 @@ public class ImageProcessor {
 					//Create imagegraph
 					M = new ArrayList[height];
 					for(int y = 0; y<height; y++) {
+						M[y] = new ArrayList<Pixel>(W);
 						nextLine = in.readLine();
 						String[] tokens = nextLine.split(delims);
 						for(int x= 0; x< tokens.length; x+=3){
