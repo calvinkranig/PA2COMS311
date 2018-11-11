@@ -185,7 +185,8 @@ private int getImportancePixel(int x, int y) {
 	 * @param FName: File to write too
 	 */
 	public void writeReduced(int k, String FName) {
-		for(int i = 0; i< k; i++){
+		int remaining = k;
+		while(this.W >1 && remaining!=0){
 		//Update needed importance
 		if(!this.importanceUpdated){
 			for(int y = 0; y<H; y++){
@@ -200,8 +201,13 @@ private int getImportancePixel(int x, int y) {
 		//Get Shortest Path
 		//Remove Nodes on Path
 		removeNodes(S2SDijkstras());
+		k--;
 		}
-		writeGraphToFile(FName);
+		//check if there is one column left
+		if(k==0){
+			writeGraphToFile(FName);
+		}
+		
 	}
 	
 	private void writeGraphToFile(String FName){
@@ -221,11 +227,7 @@ private int getImportancePixel(int x, int y) {
 		Pixel dst = Dijkstras(minheap);
 
 		if (dst != null) {
-			//dst = new node
-			LinkedList<Pixel> returnList = returnPath(dst);
-			//remove added endnode
-			returnList.remove(0);
-			return returnList;
+			return returnPath(dst);
 		} else {
 			return null;
 		}
@@ -233,7 +235,7 @@ private int getImportancePixel(int x, int y) {
 	
 	private PriorityQ makeHeap(){
 		PriorityQ newQ = new PriorityQ(W*H);
-		//Add first Rowy
+		//Add first Row
 		for(int x = 0 ;x < W; x++){
 			Pixel cur = M[0].get(x);
 			cur.setDiscovered(true);
@@ -242,6 +244,7 @@ private int getImportancePixel(int x, int y) {
 			cur.setParent(null);
 			cur.setInQ(true);
 		}
+		//Add Remaining Rows
 		for(int y = 1; y<H; y++){
 			for(int x = 0; x < W; x++){
 				Pixel cur = M[y].get(x);
@@ -270,19 +273,50 @@ private int getImportancePixel(int x, int y) {
 		return null;
 	}
 	
+	/**
+	 * Does not check for 1 pixel wide image
+	 * @param parent
+	 * @param minheap
+	 */
 	private void updateEdges(Pixel parent, PriorityQ minheap){
-		if(parent.y()!=H-1){
-			int x = parent.x();
+		int y = parent.y();
+		int x = parent.x();
+		if(y!=H-1){
 			if(x==0){
-				
+				//Get two children
+				for(int i= 0; i <=1 ; i++){
+					Pixel curChild =M[y+1].get(x+i);
+					if(curChild.inQ() && curChild.dstToSrc()>parent.dstToSrc()+curChild.importance()){
+						updateChild(parent,curChild,minheap);
+					}
+				}
 			}
 			else if(x == W-1){
-				
+				//Get two children
+				for(int i= 0; i >=-1 ; i--){
+					Pixel curChild =M[y+1].get(x+i);
+					if(curChild.inQ() && curChild.dstToSrc()>parent.dstToSrc()+curChild.importance()){
+						updateChild(parent,curChild,minheap);
+					}
+				}
 			}
 			else{
-				
+				//Get three children
+				for(int i= -1; i <=1 ; i++){
+					Pixel curChild =M[y+1].get(x+i);
+					if(curChild.inQ() && curChild.dstToSrc()>parent.dstToSrc()+curChild.importance()){
+						updateChild(parent,curChild,minheap);
+					}
+				}
 			}		
 		}
+	}
+	
+	private void updateChild(Pixel parent, Pixel child, PriorityQ minheap){
+		child.setDstToSrc(parent.dstToSrc()+child.importance());
+		child.setParent(parent);
+		child.setDiscovered(true);
+		minheap.decrementPriority(child.position(), 0);
 	}
 	
 	
