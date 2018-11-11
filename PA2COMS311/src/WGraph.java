@@ -26,6 +26,14 @@ public class WGraph {
 	public WGraph(String FName) {
 		parseFile(FName);
 	}
+	
+	public HashMap<Coord, Node> M(){
+		return GraphMap;
+	}
+	
+	public Node[] nodes(){
+		return nodes;
+	}
 
 	private void parseFile(String fName) {
 		// may need to swich to " "

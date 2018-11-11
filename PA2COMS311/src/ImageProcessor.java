@@ -17,14 +17,16 @@ import java.util.LinkedList;
 public class ImageProcessor {
 	
 	public class Pixel extends Node{
-		final int r;
-		final int g;
-		final int b;
+		private final int r;
+		private final int g;
+		private final int b;
+		private int importance;
 		public Pixel(final int r,final int g, final int b, int x, int y){
 			super(x,y);
 			this.r=r;
 			this.g=g;
 			this.b = b;
+			importance = 0;
 		}
 		public int r() {
 			return r;
@@ -37,11 +39,19 @@ public class ImageProcessor {
 		public int b() {
 			return b;
 		}
+		
+		public int importance(){
+			return this.importance;
+		}
+		
+		public void setImporatance(int i){
+			this.importance = i;
+		}
 
 		
 	}
 	//First category is height 2nd is width
-	LinkedList<Pixel>[] M;// imageGraph
+	ArrayList<Pixel>[] M;// imageGraph
 	LinkedList<Pixel> nodesToUpdate;
 	int H;
 	int W;
@@ -62,7 +72,7 @@ public class ImageProcessor {
 					nextLine=in.readLine();
 					W = Integer.parseInt(nextLine);
 					//Create imagegraph
-					M = new LinkedList[H];
+					M = new ArrayList[H];
 					for(int y = 0; y<H; y++) {
 						nextLine = in.readLine();
 						String[] tokens = nextLine.split(delims);
@@ -95,29 +105,17 @@ private static int PDist(Pixel p, Pixel q) {
 		return red + green + blue;
 	}
 	
-private int getImportanceSingle(int i, int j) {
+private int getImportancePixel(Pixel p) {
 		
 		int YImportance = 0;
 		int XImportance = 0;
 		
-		if (i == 0) {
-			YImportance = PDist(M[H - 1][j].object(), M[i+1][j].object());
-		}
-		else if(i == H - 1) {
-			YImportance = PDist(M[i - 1][j].object(), M[0][j].object());
-		}
-		else {
-			YImportance = PDist(M[i-1][j].object(), M[i+1][j].object());
+		switch(p.x()){
+		
 		}
 		
-		if(j == 0) {
-			XImportance = PDist(M[i][W].object(), M[i][j+1].object());
-		}
-		else if(j == W - 1) {
-			XImportance = PDist(M[i][j-1].object(), M[i][0].object());
-		}
-		else {
-			XImportance = PDist(M[i][j-1].object(), M[i][j+1].object());
+		switch(p.y()){
+		
 		}
 		
 		return XImportance + YImportance;
@@ -132,9 +130,24 @@ private int getImportanceSingle(int i, int j) {
 	 * post: returns the 2-D matrix I as per its definition
 	 */
 	public ArrayList<ArrayList<Integer>> getImportance(){
-		
-
-		return null;
+		//Update needed importance
+		for(Pixel p : this.nodesToUpdate){
+			updateNode(p);
+		}
+		//Convert map into needed 2-D matrix
+		ArrayList<ArrayList<Integer>> importanceMatrix = new ArrayList<ArrayList<Integer>>(H);
+		for(int y = 0; y <H; y++){
+			ArrayList<Integer> row = new ArrayList<Integer>(W);
+			importanceMatrix.add(row);
+			for(int x = 0; x <W; x++){
+				importanceMatrix.get(y).add(this.M[y].get(x).importance());
+			}
+		}
+		return importanceMatrix;
+	}
+	
+	private void updateNode(Pixel p){
+		p.setImporatance(this.getImportancePixel(p));
 	}
 	
 	/**
