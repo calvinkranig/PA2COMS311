@@ -2,8 +2,11 @@
 
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -47,6 +50,10 @@ public class ImageProcessor {
 		
 		public void setImporatance(int i){
 			this.importance = i;
+		}
+		
+		private String tostring(){
+			return "" + r + " " + g + " " + b;
 		}
 
 		
@@ -214,7 +221,26 @@ private int getImportancePixel(int x, int y) {
 	}
 	
 	private void writeGraphToFile(String FName){
-		
+		FileWriter fw;
+		try {
+			String line = System.getProperty("line.seperator");
+			fw = new FileWriter(FName, false);
+			BufferedWriter bw = new BufferedWriter(fw);
+			PrintWriter out = new PrintWriter(bw);
+			for(ArrayList<Pixel> list : M){
+				for(Pixel p: list){
+					out.print(p.tostring() + " ");
+				}
+				out.print(line);
+			}
+
+			out.close();
+			bw.close();
+			fw.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	private void removeNodes(Stack<Pixel> removeList){
