@@ -18,8 +18,11 @@ public class Main {
 		fname = "image1.txt";
 		String output = "output.txt";
 		ImageProcessor ip = new ImageProcessor(fname);
-		System.out.print(ip.getImportance());
+		System.out.println(ip.getImportance());
 		ip.writeReduced(1, output);
+		System.out.println(ip.getImportance());
+		ip.writeReduced(3, "output2.txt");
+		
 	}
 
 }

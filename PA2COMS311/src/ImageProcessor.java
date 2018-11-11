@@ -164,6 +164,7 @@ private int getImportancePixel(int x, int y) {
 				for(int x = 0; x < W; x++){
 					int importance = this.getImportancePixel(x, y);
 					M[y].get(x).setImporatance(importance);
+					M[y].get(x).coord().setX(x);
 					importanceMatrix.get(y).add(importance);
 				}
 			}
@@ -216,6 +217,7 @@ private int getImportancePixel(int x, int y) {
 		if(remaining!=0){
 			//If we need to remove last column delete graph and write nothing to file
 			this.M = new ArrayList[0];
+			this.W= 0;
 		}
 		writeGraphToFile(FName);	
 	}
@@ -249,7 +251,8 @@ private int getImportancePixel(int x, int y) {
 			Pixel cur = removeList.pop();
 			this.M[cur.y()].remove(cur.x());
 		}		
-		this.W--;
+		this.W = W-1;
+		this.importanceUpdated = false;
 	}
 	
 	private Stack<Pixel> S2SDijkstras(){
