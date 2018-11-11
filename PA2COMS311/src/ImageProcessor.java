@@ -52,7 +52,7 @@ public class ImageProcessor {
 			this.importance = i;
 		}
 		
-		private String tostring(){
+		public String tostring(){
 			return "" + r + " " + g + " " + b;
 		}
 
@@ -213,7 +213,7 @@ private int getImportancePixel(int x, int y) {
 		remaining--;
 		}
 		//check if there is one column left
-		if(k!=0){
+		if(remaining!=0){
 			//If we need to remove last column delete graph and write nothing to file
 			this.M = new ArrayList[0];
 		}
@@ -227,11 +227,12 @@ private int getImportancePixel(int x, int y) {
 			fw = new FileWriter(FName, false);
 			BufferedWriter bw = new BufferedWriter(fw);
 			PrintWriter out = new PrintWriter(bw);
-			for(ArrayList<Pixel> list : M){
-				for(Pixel p: list){
-					out.print(p.tostring() + " ");
+			for(int y = 0; y< H; y++){
+				for(int x = 0; x<W; x++){
+					String pixel = M[y].get(x).tostring() + " ";
+					out.print(pixel);
 				}
-				out.print(line);
+				out.println("");
 			}
 
 			out.close();
@@ -254,11 +255,17 @@ private int getImportancePixel(int x, int y) {
 	private Stack<Pixel> S2SDijkstras(){
 
 		PriorityQ minheap = makeHeap();	
+		Pixel dst = new Pixel(-1,-1,-1,-1,-1);
+		dst.setDiscovered(false);
+		dst.setDstToSrc(Integer.MAX_VALUE);
+		minheap.add(dst);
+		dst.setInQ(true);
+		
 		// perform Dijkstras
-		Pixel dst = Dijkstras(minheap);
+		Pixel last = Dijkstras(minheap, dst);
 
-		if (dst != null) {
-			return returnPath(dst);
+		if (last != null) {
+			return returnPath((Pixel)last.parent());
 		} else {
 			return null;
 		}
@@ -288,18 +295,18 @@ private int getImportancePixel(int x, int y) {
 		return newQ;
 	}
 	
-	private Pixel Dijkstras(PriorityQ minheap){
+	private Pixel Dijkstras(PriorityQ minheap, Pixel dst){
 		// Dealing with entrys now
 		Pixel curMin = null;
 		// Update once decrease key is implemented
 		while (!minheap.isEmpty()&& (curMin = (Pixel)minheap.extractMin()).discovered()) {
 			curMin.setInQ(false);
 			//Is curMin Destination?
-			if(curMin.y()==this.H-1){
+			if(curMin.y()==-1){
 				return curMin;
 			}
 			//Update Edges
-			updateEdges(curMin, minheap);
+			updateEdges(curMin, minheap, dst);
 		}
 		return null;
 	}
@@ -309,7 +316,7 @@ private int getImportancePixel(int x, int y) {
 	 * @param parent
 	 * @param minheap
 	 */
-	private void updateEdges(Pixel parent, PriorityQ minheap){
+	private void updateEdges(Pixel parent, PriorityQ minheap, Pixel dst){
 		int y = parent.y();
 		int x = parent.x();
 		if(y!=H-1){
@@ -340,6 +347,9 @@ private int getImportancePixel(int x, int y) {
 					}
 				}
 			}		
+		}
+		else{
+			updateChild(parent,dst,minheap);
 		}
 	}
 	
