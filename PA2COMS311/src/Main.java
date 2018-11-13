@@ -60,7 +60,7 @@ public class Main {
 		System.out.println(img.getImportance());
 		img.writeReduced(2, "marioReduced.txt");
 		
-		Picture p2 = new Picture (33,33);
+		Picture p2 = new Picture (5,5);
 		str = "";
 		str += p2.height() + line + p2.width() + line;
 		
@@ -86,8 +86,8 @@ public class Main {
 		
 		
 		ImageProcessor img2 = new ImageProcessor("output.txt");
-		System.out.println(img.getImportance());
-		img.writeReduced(30, "marioReduced.txt");
+		System.out.println(img2.getImportance());
+		img2.writeReduced(1, "output.txt");
 	}
 
 }

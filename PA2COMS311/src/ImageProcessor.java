@@ -271,7 +271,7 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 		Pixel last = Dijkstras(minheap,reduced);
 
 		if (last != null) {
-			return returnPath((Pixel)last.parent());
+			return returnPath((Pixel)last);
 		} else {
 			return null;
 		}
