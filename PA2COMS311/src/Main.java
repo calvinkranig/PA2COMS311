@@ -31,7 +31,7 @@ public class Main {
 		//Mario stuff
 		String str = "";
 		File f = new File("mario.png");
-		Picture p = new Picture(f);
+		Picture p = new Picture(1000,1000);
 		String line = System.getProperty("line.separator");
 		str += p.height() + line + p.width() + line;
 		
@@ -41,10 +41,9 @@ public class Main {
 			}
 			str += line;
 		}
-		System.out.println(str);
 		PrintWriter mario;
 		try {
-			mario = new PrintWriter("mario2.txt", "utf-8");
+			mario = new PrintWriter("input1000x1000.txt", "utf-8");
 			mario.print(str);
 			mario.close();
 		} catch (FileNotFoundException e) {
@@ -60,34 +59,9 @@ public class Main {
 		System.out.println(img.getImportance());
 		img.writeReduced(2, "marioReduced.txt");
 		
-		Picture p2 = new Picture (5,5);
-		str = "";
-		str += p2.height() + line + p2.width() + line;
 		
-		for(int i = 0; i < p2.height(); ++i) {
-			for(int j = 0; j < p2.width(); ++j) {
-				str += p2.get(j, i).getRed() + " " + p2.get(j, i).getGreen() + " " + p2.get(j, i).getBlue() + " ";
-			}
-			str += line;
-		}
-		System.out.println(str);
-		PrintWriter p2writer;
-		try {
-			p2writer = new PrintWriter("output.txt", "utf-8");
-			p2writer.print(str);
-			p2writer.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
-		ImageProcessor img2 = new ImageProcessor("output.txt");
-		System.out.println(img2.getImportance());
-		img2.writeReduced(1, "output.txt");
+		ImageProcessor img2 = new ImageProcessor("inputImage200x200.txt");
+		img2.writeReduced(200, "output3.txt");
 	}
 
 }
