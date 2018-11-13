@@ -1,7 +1,7 @@
 import java.util.LinkedList;
 
 
-public class Node {
+public class Node{
 
 	/*
 	 * private class NodeComparator implements Comparator<Node>{

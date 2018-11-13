@@ -55,7 +55,6 @@ public class ImageProcessor {
 		public String tostring(){
 			return "" + r + " " + g + " " + b;
 		}
-
 		
 	}
 	//First category is height 2nd is width
@@ -120,28 +119,31 @@ private static int PDist(Pixel p, Pixel q) {
 		return red + green + blue;
 	}
 	
-private int getImportancePixel(int x, int y) {
+private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 		
 		int YImportance = 0;
 		int XImportance = 0;
+		
+		int width = map[0].size();
+	
 		if(x == 0){
-			XImportance =PDist(M[y].get(W-1),M[y].get(1));
+			XImportance =PDist(map[y].get(width-1),map[y].get(1));
 		}
-		else if(x == W-1){
-			XImportance = PDist(M[y].get(x-1),M[y].get(0));
+		else if(x == width-1){
+			XImportance = PDist(map[y].get(x-1),map[y].get(0));
 		}
 		else{
-			XImportance = PDist(M[y].get(x-1),M[y].get(x+1));
+			XImportance = PDist(map[y].get(x-1),map[y].get(x+1));
 		}
-		
+		//Don't need to worry about height since it will be the same on reduced graph
 		if(y == 0){
-			YImportance = PDist(M[H-1].get(x), M[1].get(x));
+			YImportance = PDist(map[H-1].get(x), map[1].get(x));
 		}
 		else if(y == H-1){
-			YImportance = PDist(M[y-1].get(x),M[0].get(x));
+			YImportance = PDist(map[y-1].get(x),map[0].get(x));
 		}
 		else{
-			YImportance = PDist(M[y-1].get(x),M[y+1].get(x));
+			YImportance = PDist(map[y-1].get(x),map[y+1].get(x));
 		}
 		
 		return XImportance + YImportance;
@@ -162,10 +164,9 @@ private int getImportancePixel(int x, int y) {
 				ArrayList<Integer> row = new ArrayList<Integer>(W);
 				importanceMatrix.add(row);
 				for(int x = 0; x < W; x++){
-					int importance = this.getImportancePixel(x, y);
+					int importance = this.getImportancePixel(x, y, M);
 					M[y].get(x).setImporatance(importance);
-					M[y].get(x).coord().setX(x);
-					importanceMatrix.get(y).add(importance);
+					importanceMatrix.get(y).set(x, importance);
 				}
 			}
 			this.importanceUpdated = true;
@@ -175,7 +176,7 @@ private int getImportancePixel(int x, int y) {
 				ArrayList<Integer> row = new ArrayList<Integer>(W);
 				importanceMatrix.add(row);
 				for(int x = 0; x < W; x++){
-					importanceMatrix.get(y).add(M[y].get(x).importance());
+					importanceMatrix.get(y).set(x,M[y].get(x).importance());
 				}
 		}
 		}
@@ -194,44 +195,57 @@ private int getImportancePixel(int x, int y) {
 	 * @param FName: File to write too
 	 */
 	public void writeReduced(int k, String FName) {
-		int remaining = k;
-		while(this.W >1 && remaining!=0){
-		//Update needed importance
-		if(!this.importanceUpdated){
-			for(int y = 0; y<H; y++){
-				for(int x = 0; x < W; x++){
-					Pixel p = M[y].get(x);
-					p.setImporatance(this.getImportancePixel(x, y));
-					//Only important for this
-					p.coord().setX(x);
-				}
-			}
-			this.importanceUpdated = true;
+		if(H ==0){
+			return;
 		}
+		if(k > 1){
+			this.importanceUpdated = false;
+		}
+		int remaining = k;
+		ArrayList<Pixel>[] reduced = new ArrayList[H];
+		//Copy Image
+		for(int y = 0; y<H; y++){
+			reduced[y] = new ArrayList<Pixel>(W);
+			for(int x = 0; x < W; x++){
+				reduced[y].set(x, M[y].get(x));
+			}
+		}
+		
+		while(reduced[0].size() >1 && remaining>0){
+		//Update needed importance
+		for(int y = 0; y<reduced.length; y++){
+			for(int x = 0; x < reduced[0].size(); x++){
+				Pixel p = reduced[y].get(x);
+				p.setImporatance(this.getImportancePixel(x, y,reduced));
+				//Only important for this
+				p.coord().setX(x);
+			}
+		}
+			
 		//Get Shortest Path
 		//Remove Nodes on Path
 		removeNodes(S2SDijkstras());
 		remaining--;
 		}
+		
 		//check if there is one column left
-		if(remaining!=0){
+		if(remaining>0){
 			//If we need to remove last column delete graph and write nothing to file
-			this.M = new ArrayList[0];
-			this.W= 0;
+			reduced = new ArrayList[0];
 		}
-		writeGraphToFile(FName);	
+		writeGraphToFile(FName,reduced);	
 	}
 	
-	private void writeGraphToFile(String FName){
+	private void writeGraphToFile(String FName, ArrayList<Pixel>[] reduced){
 		FileWriter fw;
 		try {
 			String line = System.getProperty("line.seperator");
 			fw = new FileWriter(FName, false);
 			BufferedWriter bw = new BufferedWriter(fw);
 			PrintWriter out = new PrintWriter(bw);
-			for(int y = 0; y< H; y++){
-				for(int x = 0; x<W; x++){
-					String pixel = M[y].get(x).tostring() + " ";
+			for(int y = 0; y< reduced.length; y++){
+				for(int x = 0; x<reduced[y].size(); x++){
+					String pixel = reduced[y].get(x).tostring() + " ";
 					out.print(pixel);
 				}
 				out.println("");
