@@ -166,7 +166,7 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 				for(int x = 0; x < W; x++){
 					int importance = this.getImportancePixel(x, y, M);
 					M[y].get(x).setImporatance(importance);
-					importanceMatrix.get(y).set(x, importance);
+					importanceMatrix.get(y).add(importance);
 				}
 			}
 			this.importanceUpdated = true;
@@ -176,7 +176,7 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 				ArrayList<Integer> row = new ArrayList<Integer>(W);
 				importanceMatrix.add(row);
 				for(int x = 0; x < W; x++){
-					importanceMatrix.get(y).set(x,M[y].get(x).importance());
+					importanceMatrix.get(y).add(M[y].get(x).importance());
 				}
 		}
 		}
@@ -207,7 +207,7 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 		for(int y = 0; y<H; y++){
 			reduced[y] = new ArrayList<Pixel>(W);
 			for(int x = 0; x < W; x++){
-				reduced[y].set(x, M[y].get(x));
+				reduced[y].add(M[y].get(x));
 			}
 		}
 		
@@ -224,7 +224,7 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 			
 		//Get Shortest Path
 		//Remove Nodes on Path
-		removeNodes(S2SDijkstras());
+		removeNodes(S2SDijkstras(reduced),reduced);
 		remaining--;
 		}
 		
@@ -260,26 +260,19 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 		}
 	}
 	
-	private void removeNodes(Stack<Pixel> removeList){
+	private void removeNodes(Stack<Pixel> removeList, ArrayList<Pixel>[] reduced){
 		while(!removeList.isEmpty()){
 			Pixel cur = removeList.pop();
-			this.M[cur.y()].remove(cur.x());
+			reduced[cur.y()].remove(cur.x());
 		}		
-		this.W = W-1;
-		this.importanceUpdated = false;
 	}
 	
-	private Stack<Pixel> S2SDijkstras(){
+	private Stack<Pixel> S2SDijkstras(ArrayList<Pixel>[] reduced){
 
-		PriorityQ minheap = makeHeap();	
-		Pixel dst = new Pixel(-1,-1,-1,-1,-1);
-		dst.setDiscovered(false);
-		dst.setDstToSrc(Integer.MAX_VALUE);
-		minheap.add(dst);
-		dst.setInQ(true);
+		PriorityQ minheap = makeHeap(reduced);	
 		
 		// perform Dijkstras
-		Pixel last = Dijkstras(minheap, dst);
+		Pixel last = Dijkstras(minheap,reduced);
 
 		if (last != null) {
 			return returnPath((Pixel)last.parent());
@@ -288,11 +281,14 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 		}
 	}
 	
-	private PriorityQ makeHeap(){
-		PriorityQ newQ = new PriorityQ(W*H);
+	private PriorityQ makeHeap(ArrayList<Pixel>[] reduced){
+		int width = reduced[0].size();
+		int height = reduced.length;
+		
+		PriorityQ newQ = new PriorityQ(width*height);
 		//Add first Row
-		for(int x = 0 ;x < W; x++){
-			Pixel cur = M[0].get(x);
+		for(int x = 0 ;x < width; x++){
+			Pixel cur = reduced[0].get(x);
 			cur.setDiscovered(true);
 			cur.setDstToSrc(cur.importance());
 			newQ.add(cur);
@@ -300,9 +296,9 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 			cur.setInQ(true);
 		}
 		//Add Remaining Rows
-		for(int y = 1; y<H; y++){
-			for(int x = 0; x < W; x++){
-				Pixel cur = M[y].get(x);
+		for(int y = 1; y<height; y++){
+			for(int x = 0; x < width; x++){
+				Pixel cur = reduced[y].get(x);
 				cur.setDiscovered(false);
 				cur.setDstToSrc(Integer.MAX_VALUE);
 				newQ.add(cur);
@@ -312,18 +308,18 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 		return newQ;
 	}
 	
-	private Pixel Dijkstras(PriorityQ minheap, Pixel dst){
+	private Pixel Dijkstras(PriorityQ minheap,ArrayList<Pixel>[] reduced ){
 		// Dealing with entrys now
 		Pixel curMin = null;
 		// Update once decrease key is implemented
 		while (!minheap.isEmpty()&& (curMin = (Pixel)minheap.extractMin()).discovered()) {
 			curMin.setInQ(false);
-			//Is curMin Destination?
-			if(curMin.y()==-1){
+			//Is curMin in Last Row?
+			if(curMin.y()== H-1){
 				return curMin;
 			}
 			//Update Edges
-			updateEdges(curMin, minheap, dst);
+			updateEdges(curMin, minheap, reduced);
 		}
 		return null;
 	}
@@ -333,23 +329,22 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 	 * @param parent
 	 * @param minheap
 	 */
-	private void updateEdges(Pixel parent, PriorityQ minheap, Pixel dst){
+	private void updateEdges(Pixel parent, PriorityQ minheap, ArrayList<Pixel>[] reduced){
 		int y = parent.y();
 		int x = parent.x();
-		if(y!=H-1){
 			if(x==0){
 				//Get two children
 				for(int i= 0; i <=1 ; i++){
-					Pixel curChild =M[y+1].get(x+i);
+					Pixel curChild =reduced[y+1].get(x+i);
 					if(curChild.inQ() && curChild.dstToSrc()>parent.dstToSrc()+curChild.importance()){
 						updateChild(parent,curChild,minheap);
 					}
 				}
 			}
-			else if(x == W-1){
+			else if(x == reduced[0].size()-1){
 				//Get two children
 				for(int i= 0; i >=-1 ; i--){
-					Pixel curChild =M[y+1].get(x+i);
+					Pixel curChild =reduced[y+1].get(x+i);
 					if(curChild.inQ() && curChild.dstToSrc()>parent.dstToSrc()+curChild.importance()){
 						updateChild(parent,curChild,minheap);
 					}
@@ -358,17 +353,13 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 			else{
 				//Get three children
 				for(int i= -1; i <=1 ; i++){
-					Pixel curChild =M[y+1].get(x+i);
+					Pixel curChild =reduced[y+1].get(x+i);
 					if(curChild.inQ() && curChild.dstToSrc()>parent.dstToSrc()+curChild.importance()){
 						updateChild(parent,curChild,minheap);
 					}
 				}
 			}		
 		}
-		else{
-			updateChild(parent,dst,minheap);
-		}
-	}
 	
 	private void updateChild(Pixel parent, Pixel child, PriorityQ minheap){
 		child.setDstToSrc(parent.dstToSrc()+child.importance());

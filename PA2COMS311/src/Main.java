@@ -21,7 +21,7 @@ public class Main {
 		System.out.println(ip.getImportance());
 		ip.writeReduced(1, output);
 		System.out.println(ip.getImportance());
-		ip.writeReduced(3, "output2.txt");
+		ip.writeReduced(1, "output2.txt");
 		
 	}
 
