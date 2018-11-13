@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.Stack;
 
 
 
@@ -25,14 +26,6 @@ public class WGraph {
 
 	public WGraph(String FName) {
 		parseFile(FName);
-	}
-	
-	public HashMap<Coord, Node> M(){
-		return GraphMap;
-	}
-	
-	public Node[] nodes(){
-		return nodes;
 	}
 
 	private void parseFile(String fName) {
@@ -142,40 +135,17 @@ public class WGraph {
 		// Create two new nodes S1n, and S2n such that S1n is connected to all
 		// nodes in S1 and all nodes in S2 are connected to S2n
 		// Call Dijsktras on S1n and S2n
-		LinkedList<Node> L1 = this.toNodeList(S1);
-		LinkedList<Node> L2 = this.toNodeList(S2);
+		HashSet<Node> L1 = this.toNodeSet(S1);
+		HashSet<Node> L2 = this.toNodeSet(S2);
 
-		Node S1n = new Node(-1, -1);
-		Node S2n = new Node(-2, -2);
-		for (Node n : L1) {
-			S1n.addAdjacent(n, 0);
-		}
-
-		for (Node n : L2) {
-			n.addAdjacent(S2n, 0);
-		}
-
-		PriorityQ minheap = makeHeap(-1, -1);
-		minheap.add(S2n);
-		S2n.setInQ(true);
-
-		S1n.setDstToSrc(0);
-		minheap.add(S1n);
-		S1n.setInQ(true);;
-		S1n.setDiscovered(true);
+		PriorityQ minheap = makeHeap(L1);
 		
 		// perform Dijkstras
-		Node dst = Dijkstras(minheap, S2n.x(), S2n.y());
-		// Remove S2n from adjacency list of nodes
-		for (Node n : L2) {
-			n.removeLast();
-		}
+		Node dst = SetDijkstras(minheap, L2);
+		
 
 		if (dst != null) {
-			ArrayList<Integer> returnList = returnPath(dst.parent());
-			//remove added endnode
-			returnList.remove(0);
-			returnList.remove(0);
+			ArrayList<Integer> returnList = returnPath(dst);
 			return returnList;
 		} else {
 			return new ArrayList<Integer>();
@@ -223,19 +193,6 @@ public class WGraph {
 		}
 
 		return set;
-	}
-
-	private LinkedList<Node> toNodeList(ArrayList<Integer> S) {
-		Iterator<Integer> i = S.iterator();
-		LinkedList<Node> list = new LinkedList<Node>();
-
-		while (i.hasNext()) {
-			Integer x = i.next();
-			Integer y = i.next();
-			list.add(this.GraphMap.get(new Coord(x, y)));
-		}
-
-		return list;
 	}
 
 	private Node Dijkstras(PriorityQ minheap, int x, int y) {
@@ -296,25 +253,41 @@ public class WGraph {
 		}
 		return newQ;
 	}
+	
+	private PriorityQ makeHeap(HashSet<Node> start){
+		PriorityQ newQ = new PriorityQ(this.nodes.length);
+		for (int i = 0; i < this.nodes.length; i++) {
+			Node cur = this.nodes[i];
+			if (start.contains(cur)) {
+				cur.setDstToSrc(0);
+				newQ.add(cur);
+				cur.setParent(null);
+				cur.setInQ(true);
+				cur.setDiscovered(true);
+			} else {
+				cur.setDstToSrc(Integer.MAX_VALUE);
+				newQ.add(cur);
+				cur.setInQ(true);
+				cur.setDiscovered(false);
+			}
+		}
+		return newQ;
+	}
 
-	private ArrayList<Integer> returnPath(Node end) {
-		ArrayList<Integer> path = new ArrayList<Integer>();
+	private ArrayList<Integer> returnPath(Node end) {	
+		Stack<Node> path =new Stack<Node>();
 		Node cur = end;
 		while (cur != null) {
-			path.add(cur.y());
-			path.add(cur.x());
+			path.push(cur);
 			cur = cur.parent();
 		}
-		return reversePath(path);
-	}
-	
-	private ArrayList<Integer> reversePath(ArrayList<Integer> path){
-		ArrayList<Integer> reversePath = new ArrayList<Integer>();
-		for(int i = path.size()-1; i>=0; i--){
-			int it = path.get(i);
-			reversePath.add(path.get(i));
+		ArrayList<Integer> returnPath = new ArrayList<Integer>(2*path.size());
+		while(!path.isEmpty()){
+			cur = path.pop();
+			returnPath.add(cur.x());
+			returnPath.add(cur.y());
 		}
-		return reversePath;
+		return returnPath;
 	}
 
 }
