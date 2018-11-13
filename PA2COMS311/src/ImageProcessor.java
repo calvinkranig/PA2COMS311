@@ -195,43 +195,39 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 	 * @param FName: File to write too
 	 */
 	public void writeReduced(int k, String FName) {
-		if(H ==0){
-			return;
-		}
-		if(k > 1){
-			this.importanceUpdated = false;
-		}
 		int remaining = k;
 		ArrayList<Pixel>[] reduced = new ArrayList[H];
-		//Copy Image
-		for(int y = 0; y<H; y++){
-			reduced[y] = new ArrayList<Pixel>(W);
-			for(int x = 0; x < W; x++){
-				reduced[y].add(M[y].get(x));
-			}
-		}
-		
-		while(reduced[0].size() >1 && remaining>0){
-		//Update needed importance
-		for(int y = 0; y<reduced.length; y++){
-			for(int x = 0; x < reduced[0].size(); x++){
-				Pixel p = reduced[y].get(x);
-				p.setImporatance(this.getImportancePixel(x, y,reduced));
-				//Only important for this
-				p.coord().setX(x);
-			}
-		}
-			
-		//Get Shortest Path
-		//Remove Nodes on Path
-		removeNodes(S2SDijkstras(reduced),reduced);
-		remaining--;
-		}
-		
-		//check if there is one column left
-		if(remaining>0){
-			//If we need to remove last column delete graph and write nothing to file
+		if(H ==0|| k>W-1){
 			reduced = new ArrayList[0];
+		}
+		else{
+			if(k > 1){
+				this.importanceUpdated = false;
+			}
+			//Copy Image
+			for(int y = 0; y<H; y++){
+				reduced[y] = new ArrayList<Pixel>(W);
+				for(int x = 0; x < W; x++){
+					reduced[y].add(M[y].get(x));
+				}
+			}
+			
+			while(reduced[0].size() >1 && remaining>0){
+			//Update needed importance
+			for(int y = 0; y<reduced.length; y++){
+				for(int x = 0; x < reduced[0].size(); x++){
+					Pixel p = reduced[y].get(x);
+					p.setImporatance(this.getImportancePixel(x, y,reduced));
+					//Only important for this
+					p.coord().setX(x);
+				}
+			}
+				
+			//Get Shortest Path
+			//Remove Nodes on Path
+			removeNodes(S2SDijkstras(reduced),reduced);
+			remaining--;
+			}
 		}
 		writeGraphToFile(FName,reduced);	
 	}

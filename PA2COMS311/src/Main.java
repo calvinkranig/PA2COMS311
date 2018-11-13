@@ -1,5 +1,9 @@
 
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 public class Main {
@@ -23,6 +27,67 @@ public class Main {
 		System.out.println(ip.getImportance());
 		ip.writeReduced(1, "output2.txt");
 		
+		
+		//Mario stuff
+		String str = "";
+		File f = new File("mario.png");
+		Picture p = new Picture(f);
+		String line = System.getProperty("line.separator");
+		str += p.height() + line + p.width() + line;
+		
+		for(int i = 0; i < p.height(); ++i) {
+			for(int j = 0; j < p.width(); ++j) {
+				str += p.get(j, i).getRed() + " " + p.get(j, i).getGreen() + " " + p.get(j, i).getBlue() + " ";
+			}
+			str += line;
+		}
+		System.out.println(str);
+		PrintWriter mario;
+		try {
+			mario = new PrintWriter("mario2.txt", "utf-8");
+			mario.print(str);
+			mario.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		ImageProcessor img = new ImageProcessor("mario.txt");
+		System.out.println(img.getImportance());
+		img.writeReduced(2, "marioReduced.txt");
+		
+		Picture p2 = new Picture (33,33);
+		str = "";
+		str += p2.height() + line + p2.width() + line;
+		
+		for(int i = 0; i < p2.height(); ++i) {
+			for(int j = 0; j < p2.width(); ++j) {
+				str += p2.get(j, i).getRed() + " " + p2.get(j, i).getGreen() + " " + p2.get(j, i).getBlue() + " ";
+			}
+			str += line;
+		}
+		System.out.println(str);
+		PrintWriter p2writer;
+		try {
+			p2writer = new PrintWriter("output.txt", "utf-8");
+			p2writer.print(str);
+			p2writer.close();
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		
+		ImageProcessor img2 = new ImageProcessor("output.txt");
+		System.out.println(img.getImportance());
+		img.writeReduced(30, "marioReduced.txt");
 	}
 
 }
