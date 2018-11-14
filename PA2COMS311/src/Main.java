@@ -5,6 +5,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Main {
 
@@ -34,15 +35,29 @@ public class Main {
 		img.writeReduced(2, "marioReduced.txt");
 		
 		*/
+		/*
 		ImageProcessor img2 = new ImageProcessor("extratest1.txt");
-		ArrayList<ArrayList<Integer>> importance = img2.getImportance();
-		for(ArrayList<Integer> list : importance){
-			for(Integer i: list){
-				System.out.print(i + "  ");
+		for(int x = 1; x <10 ; x++){
+			ArrayList<ArrayList<Integer>> importance = img2.getImportance();
+			for(ArrayList<Integer> list : importance){
+				for(Integer i: list){
+					System.out.print(i + "  ");
+				}
+				System.out.print("\n");
 			}
 			System.out.print("\n");
+			String output = "output" + x + ".txt";
+			img2.writeReduced(1, output);
+			img2 = new ImageProcessor(output);
 		}
-		img2.writeReduced(10, "output3.txt");
+		*/
+		WGraph graph2 = new WGraph("extragraphtest1.txt");
+		System.out.println(graph2.V2V(1, 2, 5, 6));
+		ArrayList<Integer> l1 = new ArrayList(Arrays.asList(4,4,5,6,3,4));
+		System.out.println(graph2.V2S(1, 2, l1));
+		ArrayList<Integer> l2 = new ArrayList(Arrays.asList(1,2,2,2));
+		ArrayList<Integer> l3 = new ArrayList(Arrays.asList(4,4,5,6));
+		System.out.println(graph2.S2S(l1, l2));
 	}
 
 }
