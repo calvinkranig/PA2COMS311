@@ -9,7 +9,8 @@ import java.util.ArrayList;
 public class Main {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+		
+		/*// TODO Auto-generated method stub
 		String fname = "SCCinput.txt";
 		WGraph graph = new WGraph(fname);
 		ArrayList<Integer> path1 = graph.V2V(1, 6, 2, 10);
@@ -28,40 +29,20 @@ public class Main {
 		ip.writeReduced(1, "output2.txt");
 		
 		
-		//Mario stuff
-		String str = "";
-		File f = new File("mario.png");
-		Picture p = new Picture(1000,1000);
-		String line = System.getProperty("line.separator");
-		str += p.height() + line + p.width() + line;
-		
-		for(int i = 0; i < p.height(); ++i) {
-			for(int j = 0; j < p.width(); ++j) {
-				str += p.get(j, i).getRed() + " " + p.get(j, i).getGreen() + " " + p.get(j, i).getBlue() + " ";
-			}
-			str += line;
-		}
-		PrintWriter mario;
-		try {
-			mario = new PrintWriter("input1000x1000.txt", "utf-8");
-			mario.print(str);
-			mario.close();
-		} catch (FileNotFoundException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (UnsupportedEncodingException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		
-		
 		ImageProcessor img = new ImageProcessor("mario.txt");
 		System.out.println(img.getImportance());
 		img.writeReduced(2, "marioReduced.txt");
 		
-		
-		ImageProcessor img2 = new ImageProcessor("inputImage200x200.txt");
-		img2.writeReduced(200, "output3.txt");
+		*/
+		ImageProcessor img2 = new ImageProcessor("extratest1.txt");
+		ArrayList<ArrayList<Integer>> importance = img2.getImportance();
+		for(ArrayList<Integer> list : importance){
+			for(Integer i: list){
+				System.out.print(i + "  ");
+			}
+			System.out.print("\n");
+		}
+		img2.writeReduced(10, "output3.txt");
 	}
 
 }

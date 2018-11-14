@@ -239,14 +239,19 @@ private int getImportancePixel(int x, int y, ArrayList<Pixel>[] map) {
 			fw = new FileWriter(FName, false);
 			BufferedWriter bw = new BufferedWriter(fw);
 			PrintWriter out = new PrintWriter(bw);
-			for(int y = 0; y< reduced.length; y++){
-				for(int x = 0; x<reduced[y].size(); x++){
-					String pixel = reduced[y].get(x).tostring() + " ";
-					out.print(pixel);
+			if(reduced.length >0){
+				//print height
+				out.println(reduced.length);
+				//print width
+				out.println(reduced[0].size());
+				for(int y = 0; y< reduced.length; y++){
+					for(int x = 0; x<reduced[y].size(); x++){
+						String pixel = reduced[y].get(x).tostring() + " ";
+						out.print(pixel);
+					}
+					out.println("");
 				}
-				out.println("");
 			}
-
 			out.close();
 			bw.close();
 			fw.close();
